@@ -5,7 +5,7 @@ import mysql, {
   type ResultSetHeader,
   type RowDataPacket,
 } from "mysql2/promise";
-import { requireEnv } from "@/lib/env";
+import { env, requireEnv } from "@/lib/env";
 
 /**
  * MySQL access for route handlers (HANDOFF 4.8).
@@ -25,9 +25,9 @@ const globalForPool = globalThis as unknown as { __tlMysqlPool?: Pool };
 function pool(): Pool {
   if (!globalForPool.__tlMysqlPool) {
     globalForPool.__tlMysqlPool = mysql.createPool({
-      host: process.env.MYSQL_HOST ?? "127.0.0.1",
-      port: Number(process.env.MYSQL_PORT ?? 3307),
-      database: process.env.MYSQL_DATABASE ?? "threatlattice",
+      host: env("MYSQL_HOST", "127.0.0.1"),
+      port: Number(env("MYSQL_PORT", "3307")),
+      database: env("MYSQL_DATABASE", "threatlattice"),
       user: requireEnv("MYSQL_APP_USER"),
       password: requireEnv("MYSQL_APP_PASSWORD"),
       connectionLimit: 10,

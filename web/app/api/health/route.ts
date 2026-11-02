@@ -16,7 +16,8 @@ export async function GET() {
     const row = await queryOne<{ as_of: string | null }>("SELECT MAX(last_modified_date) AS as_of FROM cve");
     mysql = true;
     dataAsOf = row?.as_of ?? null;
-  } catch {
+  } catch (err) {
+    console.error("[health] mysql:", (err as Error).message);
     mysql = false;
   }
   const neo4j = await neo4jHealthy();

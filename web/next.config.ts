@@ -1,11 +1,8 @@
-import path from "node:path";
-import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
 
-// One .env for the whole repo: docker compose, the Python ETL and this app
-// all read <repo>/.env. Next only loads env files from web/, so load the
-// parent folder explicitly. Values already set in the shell win.
-loadEnvConfig(path.resolve(process.cwd(), ".."));
+// Settings (DB passwords, AUTH_SECRET) live in <repo>/.env, shared with
+// docker compose and the Python ETL. Server code reads them through
+// lib/env.ts, which loads that file on first use.
 
 const nextConfig: NextConfig = {
   cacheComponents: true,

@@ -1,6 +1,6 @@
 import "server-only";
 import neo4j, { type Driver } from "neo4j-driver";
-import { requireEnv } from "@/lib/env";
+import { env, requireEnv } from "@/lib/env";
 
 /**
  * Neo4j access for route handlers. Always pass values as $params in Cypher.
@@ -12,8 +12,8 @@ const globalForDriver = globalThis as unknown as { __tlNeo4j?: Driver };
 function driver(): Driver {
   if (!globalForDriver.__tlNeo4j) {
     globalForDriver.__tlNeo4j = neo4j.driver(
-      process.env.NEO4J_URI ?? "bolt://127.0.0.1:7687",
-      neo4j.auth.basic(process.env.NEO4J_USER ?? "neo4j", requireEnv("NEO4J_PASSWORD")),
+      env("NEO4J_URI", "bolt://127.0.0.1:7687"),
+      neo4j.auth.basic(env("NEO4J_USER", "neo4j"), requireEnv("NEO4J_PASSWORD")),
       { disableLosslessIntegers: true, maxConnectionPoolSize: 20 },
     );
   }
@@ -40,7 +40,8 @@ export async function neo4jHealthy(): Promise<boolean> {
   try {
     await driver().verifyConnectivity();
     return true;
-  } catch {
+  } catch (err) {
+    console.error("[health] neo4j:", (err as Error).message);
     return false;
   }
 }
