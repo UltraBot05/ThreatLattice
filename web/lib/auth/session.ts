@@ -1,10 +1,9 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { SignJWT, jwtVerify } from "jose";
-import { queryOne } from "@/lib/db/mysql";
-import { requireEnv } from "@/lib/env";
 import { forbidden, unauthorized } from "@/lib/api";
+import { queryOne } from "@/lib/db/mysql";
 import type { Role, SessionUser } from "@/lib/types";
+import { readSessionToken, SESSION_COOKIE, SESSION_MAX_AGE_S, signSessionToken } from "./token";
 
 /**
  * Sessions: a signed (HS256) JWT in an httpOnly cookie. The token only says
@@ -14,47 +13,24 @@ import type { Role, SessionUser } from "@/lib/types";
  * Every API route except /api/auth/* and /api/health starts with
  * requireUser() or requireRole("admin").
  */
-const COOKIE = "tl_session";
-const MAX_AGE_S = 60 * 60 * 8; // 8 hours
-
-function key(): Uint8Array {
-  const secret = requireEnv("AUTH_SECRET");
-  if (secret.length < 32) throw new Error("AUTH_SECRET must be at least 32 characters.");
-  return new TextEncoder().encode(secret);
-}
 
 export async function createSession(user: SessionUser): Promise<void> {
-  const token = await new SignJWT({ username: user.username, role: user.role })
-    .setProtectedHeader({ alg: "HS256" })
-    .setSubject(String(user.id))
-    .setIssuedAt()
-    .setExpirationTime(`${MAX_AGE_S}s`)
-    .sign(key());
-  (await cookies()).set(COOKIE, token, {
+  (await cookies()).set(SESSION_COOKIE, await signSessionToken(user), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: MAX_AGE_S,
+    maxAge: SESSION_MAX_AGE_S,
   });
 }
 
 export async function destroySession(): Promise<void> {
-  (await cookies()).delete(COOKIE);
+  (await cookies()).delete(SESSION_COOKIE);
 }
 
 /** Who the cookie says you are (signature + expiry checked), or null. No DB call. */
 export async function getSession(): Promise<SessionUser | null> {
-  const token = (await cookies()).get(COOKIE)?.value;
-  if (!token) return null;
-  try {
-    const { payload } = await jwtVerify(token, key(), { algorithms: ["HS256"] });
-    const id = Number(payload.sub);
-    if (!Number.isInteger(id)) return null;
-    return { id, username: String(payload.username), role: payload.role as Role };
-  } catch {
-    return null;
-  }
+  return readSessionToken((await cookies()).get(SESSION_COOKIE)?.value);
 }
 
 /** The signed-in, still-active user from the database, or a 401. */

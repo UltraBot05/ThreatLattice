@@ -53,8 +53,9 @@ python -m venv .venv
 pip install -r etl/requirements.txt
 python -m etl.download          # ~100 MB into data/raw/
 python -m etl.load_cwe
-python -m etl.load_nvd          # ~90 s
+python -m etl.load_nvd          # ~90 s native MySQL, ~3 min against Docker on Windows
 python -m etl.load_kev
+python -m etl.seed_users        # demo admin + analyst (passwords from .env, or printed)
 
 # 4. web app
 cd web
