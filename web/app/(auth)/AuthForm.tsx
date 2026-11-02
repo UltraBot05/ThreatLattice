@@ -7,12 +7,8 @@ import { Headline } from "@/components/motion/Headline";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
 import { api } from "@/lib/client/api";
+import { safeNext } from "@/lib/auth/redirect";
 import { loginSchema, registerSchema } from "@/lib/auth/schemas";
-
-/** Only allow redirects back into this app ("/x", never "//evil.com" or "https://..."). */
-function safeNext(next: string | null): string {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
-}
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const router = useRouter();
