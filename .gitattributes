@@ -1,0 +1,10 @@
+# Files that run inside Linux containers must keep LF endings, even when the
+# repo is checked out on Windows (CRLF breaks bash and the mysql client).
+*.sh     text eol=lf
+*.sql    text eol=lf
+*.cypher text eol=lf
+*.py     text eol=lf
+docker-compose.yml text eol=lf
+
+*.png binary
+*.drawio text
