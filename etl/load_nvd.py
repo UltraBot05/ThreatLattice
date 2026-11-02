@@ -12,6 +12,10 @@ Parsing rules (HANDOFF 4.7)
   if no version has a Primary score the same order is tried again for
   Secondary. Without this fallback about 70% of 2024-2026 CVEs would show
   as unscored. The source used is counted in the output.
+- cvss_source records who produced the chosen score: NVD (a Primary
+  metric), ADP (a Secondary metric from CISA's Authorized Data Publisher,
+  identified by its fixed source id), or CNA (any other Secondary metric:
+  the organisation that published the CVE). NULL when unscored.
 - cvss_severity is left NULL when NVD gives none; trg_cve_bi derives it.
 - CWE from weaknesses[].description[].value. NVD placeholders
   (NVD-CWE-Other, NVD-CWE-noinfo) are skipped, and so are CWE IDs that are
@@ -46,16 +50,18 @@ CVSS_ORDER = ("cvssMetricV31", "cvssMetricV40", "cvssMetricV30")
 MAX_TEXT_BYTES = 65535                     # MySQL TEXT limit (bytes, not characters)
 CPE_SPLIT = re.compile(r"(?<!\\):")        # ':' not preceded by a backslash
 CPE_UNESCAPE = re.compile(r"\\(.)")        # '\/' -> '/', '\:' -> ':'
+CISA_ADP_SOURCE = "134c704f-9b21-4f2e-91b3-4a467353bcc0"   # NVD's source id for CISA-ADP
 
 CVE_UPSERT = (
     "INSERT INTO cve (cve_id, description, published_date, last_modified_date, "
-    "cvss_base_score, cvss_severity, cvss_vector, cvss_version) VALUES {rows} "
+    "cvss_base_score, cvss_severity, cvss_vector, cvss_version, cvss_source) VALUES {rows} "
     "AS new ON DUPLICATE KEY UPDATE "
     "description = new.description, published_date = new.published_date, "
     "last_modified_date = new.last_modified_date, cvss_base_score = new.cvss_base_score, "
-    "cvss_severity = new.cvss_severity, cvss_vector = new.cvss_vector, cvss_version = new.cvss_version"
+    "cvss_severity = new.cvss_severity, cvss_vector = new.cvss_vector, cvss_version = new.cvss_version, "
+    "cvss_source = new.cvss_source"
 )
-CVE_ROW = "(%s, %s, %s, %s, %s, %s, %s, %s)"
+CVE_ROW = "(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
 # KEV columns are not in the UPDATE list on purpose: load_kev.py owns them,
 # so re-loading NVD never wipes the KEV flags.
 
@@ -66,14 +72,21 @@ CPE_INSERT = "INSERT IGNORE INTO cpe (vendor, product, version) VALUES {rows}"
 CPE_ROW = "(%s, %s, %s)"
 
 
-def pick_cvss(metrics: dict) -> tuple[dict | None, str]:
-    """Return (cvssData, source label) following the pick order, or (None, 'none')."""
+def pick_cvss(metrics: dict) -> tuple[dict | None, str | None, str]:
+    """Return (cvssData, cvss_source, label for the counts) following the pick
+    order, or (None, None, 'none')."""
     for wanted in ("Primary", "Secondary"):
         for key in CVSS_ORDER:
             for entry in metrics.get(key, []):
                 if entry.get("type") == wanted:
-                    return entry["cvssData"], f"{key[-3:].lower()} {wanted.lower()}"
-    return None, "none"
+                    if wanted == "Primary":
+                        source = "NVD"
+                    elif entry.get("source") == CISA_ADP_SOURCE:
+                        source = "ADP"
+                    else:
+                        source = "CNA"
+                    return entry["cvssData"], source, f"{key[-3:].lower()} {source}"
+    return None, None, "none"
 
 
 def parse_cpe(criteria: str) -> tuple[str, str, str] | None:
@@ -112,14 +125,15 @@ def parse_year(path: Path, stats: Counter) -> tuple[list[tuple], list[str], dict
             stats["skipped_no_english_description"] += 1
             continue
 
-        cvss, source = pick_cvss(c.get("metrics", {}))
-        stats[f"score_from {source}"] += 1
+        cvss, source, label = pick_cvss(c.get("metrics", {}))
+        stats[f"score_from {label}"] += 1
         rows.append((
             c["id"], desc, c["published"][:10], c.get("lastModified", "")[:10] or None,
             cvss["baseScore"] if cvss else None,
             cvss.get("baseSeverity") if cvss else None,
             cvss.get("vectorString") if cvss else None,
             cvss.get("version") if cvss else None,
+            source,
         ))
 
         ids = set()
