@@ -38,10 +38,10 @@
 <path d="M1330,761.0 L1400,761.0" class="ln"/>
 <line x1="1338.0" y1="768.0" x2="1338.0" y2="754.0" class="ln"/><line x1="1344.0" y1="768.0" x2="1344.0" y2="754.0" class="ln"/>
 <line x1="1387.0" y1="761.0" x2="1400.0" y2="769.0" class="ln"/><line x1="1387.0" y1="761.0" x2="1400.0" y2="761.0" class="ln"/><line x1="1387.0" y1="761.0" x2="1400.0" y2="753.0" class="ln"/><circle cx="1380.0" cy="761.0" r="5" class="cir"/>
-<path d="M1195.0,362 L1195.0,440" class="dash"/>
-<text x="1203.0" y="405.0" class="lbl">logical link, no FK (CVE may not be in NVD yet)</text>
-<path d="M515.0,230 L515.0,440" class="dash"/>
-<text x="523.0" y="339.0" class="lbl">EXPLOITS (Neo4j only)</text>
+<path d="M1195.0,384 L1195.0,440" class="dash"/>
+<text x="1203.0" y="416.0" class="lbl">logical link, no FK (CVE may not be in NVD yet)</text>
+<path d="M515.0,252 L515.0,440" class="dash"/>
+<text x="523.0" y="350.0" class="lbl">EXPLOITS (Neo4j only)</text>
 <path d="M380,503.0 L310,503.0" class="dash"/>
 <text x="345.0" y="497.0" text-anchor="middle" class="lbl">ENABLES</text>
 <rect x="40" y="90" width="270" height="96" fill="#fff" stroke="#111" stroke-width="1.3"/>
@@ -58,25 +58,29 @@
 <line x1="40" y1="164" x2="310" y2="164" stroke="#ddd"/>
 <text x="88" y="179.5" class="nm">relationship_type</text>
 <text x="302" y="179.5" text-anchor="end" class="mono">VARCHAR(20)</text>
-<rect x="380" y="90" width="270" height="140" fill="#fff" stroke="#111" stroke-width="1.3"/>
+<rect x="380" y="90" width="270" height="162" fill="#fff" stroke="#111" stroke-width="1.3"/>
 <rect x="380" y="90" width="270" height="30" fill="#e4e4e4" stroke="#111" stroke-width="1.3"/>
 <text x="515.0" y="110" text-anchor="middle" class="hd">cwe</text>
-<line x1="420" y1="120" x2="420" y2="230" stroke="#bbb"/>
+<line x1="420" y1="120" x2="420" y2="252" stroke="#bbb"/>
 <text x="400" y="135" text-anchor="middle" class="key">PK</text>
 <text x="428" y="135.5" class="nm" text-decoration="underline">cwe_id</text>
 <text x="642" y="135.5" text-anchor="end" class="mono">VARCHAR(12)</text>
 <line x1="380" y1="142" x2="650" y2="142" stroke="#ddd"/>
 <text x="428" y="157.5" class="nm">name</text>
 <text x="642" y="157.5" text-anchor="end" class="mono">VARCHAR(255)</text>
+<rect x="381" y="164.5" width="268" height="21" fill="#fbecd2"/>
 <line x1="380" y1="164" x2="650" y2="164" stroke="#ddd"/>
-<text x="428" y="179.5" class="nm">abstraction</text>
-<text x="642" y="179.5" text-anchor="end" class="mono">VARCHAR(20)</text>
+<text x="428" y="179.5" class="nm">common_name</text>
+<text x="642" y="179.5" text-anchor="end" class="mono">VARCHAR(255)</text>
 <line x1="380" y1="186" x2="650" y2="186" stroke="#ddd"/>
-<text x="428" y="201.5" class="nm">status</text>
+<text x="428" y="201.5" class="nm">abstraction</text>
 <text x="642" y="201.5" text-anchor="end" class="mono">VARCHAR(20)</text>
 <line x1="380" y1="208" x2="650" y2="208" stroke="#ddd"/>
-<text x="428" y="223.5" class="nm">description</text>
-<text x="642" y="223.5" text-anchor="end" class="mono">TEXT</text>
+<text x="428" y="223.5" class="nm">status</text>
+<text x="642" y="223.5" text-anchor="end" class="mono">VARCHAR(20)</text>
+<line x1="380" y1="230" x2="650" y2="230" stroke="#ddd"/>
+<text x="428" y="245.5" class="nm">description</text>
+<text x="642" y="245.5" text-anchor="end" class="mono">TEXT</text>
 <rect x="720" y="90" width="270" height="74" fill="#fff" stroke="#111" stroke-width="1.3"/>
 <rect x="720" y="90" width="270" height="30" fill="#e4e4e4" stroke="#111" stroke-width="1.3"/>
 <text x="855.0" y="110" text-anchor="middle" class="hd">cve_cwe</text>
@@ -88,10 +92,10 @@
 <text x="740" y="157" text-anchor="middle" class="key">PK FK</text>
 <text x="768" y="157.5" class="nm" text-decoration="underline">cwe_id</text>
 <text x="982" y="157.5" text-anchor="end" class="mono">VARCHAR(12)</text>
-<rect x="1060" y="90" width="270" height="272" fill="#fff" stroke="#111" stroke-width="1.3"/>
+<rect x="1060" y="90" width="270" height="294" fill="#fff" stroke="#111" stroke-width="1.3"/>
 <rect x="1060" y="90" width="270" height="30" fill="#e4e4e4" stroke="#111" stroke-width="1.3"/>
 <text x="1195.0" y="110" text-anchor="middle" class="hd">cve</text>
-<line x1="1100" y1="120" x2="1100" y2="362" stroke="#bbb"/>
+<line x1="1100" y1="120" x2="1100" y2="384" stroke="#bbb"/>
 <text x="1080" y="135" text-anchor="middle" class="key">PK</text>
 <text x="1108" y="135.5" class="nm" text-decoration="underline">cve_id</text>
 <text x="1322" y="135.5" text-anchor="end" class="mono">VARCHAR(20)</text>
@@ -121,16 +125,20 @@
 <text x="1322" y="289.5" text-anchor="end" class="mono">VARCHAR(4)</text>
 <rect x="1061" y="296.5" width="268" height="21" fill="#fbecd2"/>
 <line x1="1060" y1="296" x2="1330" y2="296" stroke="#ddd"/>
-<text x="1108" y="311.5" class="nm">is_kev</text>
-<text x="1322" y="311.5" text-anchor="end" class="mono">BOOLEAN</text>
+<text x="1108" y="311.5" class="nm">cvss_source</text>
+<text x="1322" y="311.5" text-anchor="end" class="mono">ENUM</text>
 <rect x="1061" y="318.5" width="268" height="21" fill="#fbecd2"/>
 <line x1="1060" y1="318" x2="1330" y2="318" stroke="#ddd"/>
-<text x="1108" y="333.5" class="nm">kev_date_added</text>
-<text x="1322" y="333.5" text-anchor="end" class="mono">DATE</text>
+<text x="1108" y="333.5" class="nm">is_kev</text>
+<text x="1322" y="333.5" text-anchor="end" class="mono">BOOLEAN</text>
 <rect x="1061" y="340.5" width="268" height="21" fill="#fbecd2"/>
 <line x1="1060" y1="340" x2="1330" y2="340" stroke="#ddd"/>
-<text x="1108" y="355.5" class="nm">kev_ransomware</text>
-<text x="1322" y="355.5" text-anchor="end" class="mono">BOOLEAN</text>
+<text x="1108" y="355.5" class="nm">kev_date_added</text>
+<text x="1322" y="355.5" text-anchor="end" class="mono">DATE</text>
+<rect x="1061" y="362.5" width="268" height="21" fill="#fbecd2"/>
+<line x1="1060" y1="362" x2="1330" y2="362" stroke="#ddd"/>
+<text x="1108" y="377.5" class="nm">kev_ransomware</text>
+<text x="1322" y="377.5" text-anchor="end" class="mono">BOOLEAN</text>
 <rect x="1400" y="90" width="270" height="74" fill="#fff" stroke="#111" stroke-width="1.3"/>
 <rect x="1400" y="90" width="270" height="30" fill="#e4e4e4" stroke="#111" stroke-width="1.3"/>
 <text x="1535.0" y="110" text-anchor="middle" class="hd">cve_cpe</text>

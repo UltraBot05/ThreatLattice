@@ -11,7 +11,9 @@
 -- moment someone renames it.
 --
 -- Changes from Deliverable 1 (agreed in HANDOFF 4.4), in short:
---   cve               NONE severity, cvss_version, KEV columns + CHECK
+--   cve               NONE severity, cvss_version, cvss_source, KEV
+--                     columns + CHECKs, cvss_vector 255
+--   cwe               common_name (CWE 5.0 moved it out of `name`)
 --   capec             five-level ENUMs (CAPEC's own scale)
 --   attack_technique  ID format CHECK, tactic/platform moved out (1NF)
 --   technique_tactic  NEW junction table (technique has many tactics)
@@ -36,12 +38,17 @@
 -- already uses them, so joins and the Neo4j sync need no lookup table.
 -- ---------------------------------------------------------------------
 
--- cwe: kinds of weakness (Weaknesses AND Categories from the CWE XML,
--- because NVD sometimes tags a CVE with a category ID). Deprecated
--- entries are kept with their status so old CVEs still join.
+-- cwe: kinds of weakness (Weaknesses AND Groupings, called Categories
+-- before CWE 5.0, because NVD sometimes tags a CVE with a grouping ID).
+-- Deprecated entries are kept with their status so old CVEs still join.
 CREATE TABLE cwe (
     cwe_id      VARCHAR(12)  PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
+    -- v2: the name analysts actually use ('Cross-site Scripting',
+    -- 'SQL Injection'). CWE 5.0 removed it from `name` and lists it as
+    -- an Alternate_Term with role Common-Name; only ~40 weaknesses have
+    -- one, so it is NULL for the rest and the UI falls back to `name`.
+    common_name VARCHAR(255) NULL,
     abstraction VARCHAR(20),              -- Pillar/Class/Base/Variant, or 'Category'
     status      VARCHAR(20),              -- Stable/Draft/Incomplete/Deprecated...
     description TEXT,
@@ -148,6 +155,12 @@ CREATE TABLE cve (
     -- v2: which CVSS version the score came from (3.1, 4.0, 3.0);
     -- scores from different versions are not strictly comparable.
     cvss_version       VARCHAR(4),
+    -- v2: who produced the score. NVD = NVD's own analysis (Primary);
+    -- CNA = the organisation that published the CVE, often the vendor
+    -- (Secondary); ADP = CISA's Authorized Data Publisher (Secondary).
+    -- Most new CVEs only have a CNA or ADP score, and the UI labels
+    -- those as not NVD-assessed.
+    cvss_source        ENUM('NVD','CNA','ADP') NULL,
     -- v2: CISA Known Exploited Vulnerabilities. BOOLEAN NOT NULL
     -- DEFAULT FALSE (not NULL) so "not in KEV" is a clear FALSE and
     -- COUNT/SUM over it need no IFNULL.
@@ -158,6 +171,10 @@ CREATE TABLE cve (
     -- NULL passes a CHECK (it is not FALSE), so unscored CVEs are fine.
     CONSTRAINT chk_cvss_range  CHECK (cvss_base_score BETWEEN 0.0 AND 10.0),
     CONSTRAINT chk_cvss_version CHECK (cvss_version IN ('3.0','3.1','4.0')),
+    -- v2: a score always has a source, and a source needs a score.
+    -- Written as the two allowed states (both NULL / both set).
+    CONSTRAINT chk_cvss_source CHECK ((cvss_base_score IS NULL AND cvss_source IS NULL)
+                                   OR (cvss_base_score IS NOT NULL AND cvss_source IS NOT NULL)),
     -- v2: KEV date is present exactly when the CVE is in KEV. Written
     -- as two allowed states, so both "flag without date" and "date
     -- without flag" are rejected.
