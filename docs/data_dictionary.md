@@ -34,7 +34,7 @@ Key column: **PK** primary key, **FK** foreign key, **UQ** unique. Rows marked *
 | last_modified_date | DATE | | yes | | |
 | cvss_base_score | DECIMAL(3,1) | | yes | | `chk_cvss_range`: 0.0–10.0; NULL = not scored yet; index `idx_cve_score` |
 | cvss_severity | ENUM('NONE','LOW','MEDIUM','HIGH','CRITICAL') | | yes | | *v2* adds `NONE`. Filled from the score by trigger `trg_cve_bi`/`trg_cve_bu` when NULL; index `idx_cve_severity` |
-| cvss_vector | VARCHAR(128) | | yes | | e.g. `CVSS:3.1/AV:N/AC:L/...` |
+| cvss_vector | VARCHAR(255) | | yes | | *v2*: was 128; CVSS 4.0 vectors from NVD reach 178 chars. e.g. `CVSS:3.1/AV:N/AC:L/...` |
 | cvss_version | VARCHAR(4) | | yes | | *v2*. `chk_cvss_version`: `3.0`, `3.1` or `4.0` |
 | is_kev | BOOLEAN | | no | FALSE | *v2*. In CISA KEV; index `idx_cve_kev` |
 | kev_date_added | DATE | | yes | | *v2*. `chk_kev_date`: set if and only if `is_kev` is TRUE |

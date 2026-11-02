@@ -111,9 +111,10 @@
 <line x1="1060" y1="230" x2="1330" y2="230" stroke="#ddd"/>
 <text x="1108" y="245.5" class="nm">cvss_severity</text>
 <text x="1322" y="245.5" text-anchor="end" class="mono">ENUM</text>
+<rect x="1061" y="252.5" width="268" height="21" fill="#fbecd2"/>
 <line x1="1060" y1="252" x2="1330" y2="252" stroke="#ddd"/>
 <text x="1108" y="267.5" class="nm">cvss_vector</text>
-<text x="1322" y="267.5" text-anchor="end" class="mono">VARCHAR(128)</text>
+<text x="1322" y="267.5" text-anchor="end" class="mono">VARCHAR(255)</text>
 <rect x="1061" y="274.5" width="268" height="21" fill="#fbecd2"/>
 <line x1="1060" y1="274" x2="1330" y2="274" stroke="#ddd"/>
 <text x="1108" y="289.5" class="nm">cvss_version</text>

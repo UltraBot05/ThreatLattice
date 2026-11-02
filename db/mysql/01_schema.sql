@@ -141,7 +141,10 @@ CREATE TABLE cve (
     -- If the loader leaves this NULL, trigger trg_cve_bi derives it
     -- from the score (04_triggers.sql).
     cvss_severity      ENUM('NONE','LOW','MEDIUM','HIGH','CRITICAL'),
-    cvss_vector        VARCHAR(128),
+    -- v2: 255, was 128. NVD writes CVSS 4.0 vectors out in full (every
+    -- optional metric, even 'X' = not defined), up to 178 characters;
+    -- all 41,765 v4.0 vectors in the 2024-2026 feeds were over 128.
+    cvss_vector        VARCHAR(255),
     -- v2: which CVSS version the score came from (3.1, 4.0, 3.0);
     -- scores from different versions are not strictly comparable.
     cvss_version       VARCHAR(4),
