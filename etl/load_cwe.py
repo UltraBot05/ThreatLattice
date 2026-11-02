@@ -10,6 +10,10 @@ What it loads
   abstraction level of their own, so they are stored as 'Category'.
   Deprecated/obsolete entries are kept with their status so old CVEs that
   still reference them can join.
+  common_name: CWE 5.0 dropped the everyday name from `Name` (CWE-79 is no
+  longer "... ('Cross-site Scripting')"); it is now an Alternate_Term with
+  role Common-Name. The first such term that is a single name and shorter
+  than the official name is stored; most CWEs have none.
 - cwe_relationship: one row per (parent, child) from each Weakness's
   Related_Weakness elements with Nature="ChildOf". The same pair is listed
   once per CWE view, so duplicates are dropped. Pairs whose parent or child
@@ -42,11 +46,12 @@ MAX_NAME = 255
 # Multi-row upsert. The `AS new` row alias (MySQL 8.0.19+) replaces the
 # deprecated VALUES(col) function in the UPDATE part.
 CWE_UPSERT = (
-    "INSERT INTO cwe (cwe_id, name, abstraction, status, description) VALUES {rows} "
+    "INSERT INTO cwe (cwe_id, name, abstraction, status, description, common_name) VALUES {rows} "
     "AS new ON DUPLICATE KEY UPDATE "
-    "name = new.name, abstraction = new.abstraction, status = new.status, description = new.description"
+    "name = new.name, abstraction = new.abstraction, status = new.status, "
+    "description = new.description, common_name = new.common_name"
 )
-CWE_ROW = "(%s, %s, %s, %s, %s)"
+CWE_ROW = "(%s, %s, %s, %s, %s, %s)"
 
 # INSERT IGNORE: a pair that already exists is skipped instead of failing
 # the whole batch on the composite primary key.
@@ -82,10 +87,23 @@ def parse(path: Path) -> tuple[list[tuple], list[tuple[str, str]], dict]:
     pairs: set[tuple[str, str]] = set()
     raw_pairs = 0
 
+    def common_name(elem: ET.Element) -> str | None:
+        # First Common-Name term that is a single name (not a list such as
+        # CWE-190's "Year 2038 problem, Y2K38, ...") and shorter than the
+        # official name. If the official name is already the shorter one
+        # (CWE-91 "XML Injection"), it already is the everyday label.
+        official = elem.get("Name") or ""
+        for term in elem.iterfind(f"{q('Alternate_Terms')}/{q('Alternate_Term')}"):
+            if any(r.text == "Common-Name" for r in term.iterfind(q("Role"))):
+                name = clean_text(term.find(q("Term")))
+                if name and "," not in name and len(name) < len(official):
+                    return name[:MAX_NAME]
+        return None
+
     for w in root.iterfind(f"{q('Weaknesses')}/{q('Weakness')}"):
         cwe_id = f"CWE-{w.get('ID')}"
         rows.append((cwe_id, w.get("Name")[:MAX_NAME], w.get("Abstraction"), w.get("Status"),
-                     clean_text(w.find(q("Description")))))
+                     clean_text(w.find(q("Description"))), common_name(w)))
         for rel in w.iterfind(f"{q('Related_Weaknesses')}/{q('Related_Weakness')}"):
             if rel.get("Nature") == "ChildOf":
                 raw_pairs += 1
@@ -95,7 +113,7 @@ def parse(path: Path) -> tuple[list[tuple], list[tuple[str, str]], dict]:
     for section, item in (("Groupings", "Grouping"), ("Categories", "Category")):
         for g in root.iterfind(f"{q(section)}/{q(item)}"):
             rows.append((f"CWE-{g.get('ID')}", g.get("Name")[:MAX_NAME], "Category", g.get("Status"),
-                         clean_text(g.find(q("Summary")))))
+                         clean_text(g.find(q("Summary"))), common_name(g)))
 
     known = {r[0] for r in rows}
     kept = [(p, c) for p, c in sorted(pairs) if p in known and c in known and p != c]
@@ -157,6 +175,7 @@ def load(path: Path) -> dict:
         "cwe_rows": len(rows),
         "weaknesses": weaknesses,
         "categories": len(rows) - weaknesses,
+        "with_common_name": sum(1 for r in rows if r[5]),
         "cwe_inserted": new_cwe,
         "cwe_refreshed": len(rows) - new_cwe,
         "relationships": len(pairs),
