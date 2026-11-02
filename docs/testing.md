@@ -6,7 +6,7 @@ Test file: [`db/mysql/tests/constraint_tests.sql`](../db/mysql/tests/constraint_
 
 The database must reject bad data by itself, whatever client sends it (the web API, the ETL scripts, or someone at the MySQL console). The API validates input too (zod), but these tests skip the API and talk straight to MySQL, so the only thing that can stop bad data here is the schema: CHECK constraints, ENUM types, NOT NULL, PRIMARY KEY / UNIQUE, FOREIGN KEY, the JSON type, and the `SIGNAL` checks inside `sp_create_investigation`.
 
-- **F-tests**: 35 statements that must **fail**, each with its expected error written above it in the file.
+- **F-tests**: 38 statements that must **fail**, each with its expected error written above it in the file.
 - **P-tests**: 7 statements that must **succeed**, each followed by a `SELECT` that prints `PASS` or `FAIL`. They prove the constraints do not block valid data, and that the triggers and the procedure do their job.
 
 ## How to run
@@ -67,14 +67,19 @@ Strict mode matters: without it MySQL stores an invalid ENUM value as `''` with 
 | F33 | Unique slug | `tl-test-event` twice | 1062 duplicate `security_event.slug` | 1062 Duplicate entry 'tl-test-event' for key 'security_event.slug' | Pass |
 | F34 | Event CVE ID format | `cve_id = 'GITLAB-2026-1'` | 3819 `chk_event_cve_id` | 3819 `chk_event_cve_id` is violated | Pass |
 | F35 | event_cve → security_event FK | `event_id = 999999999` | 1452 FK fails | 1452 FK `event_cve_ibfk_1` fails | Pass |
+| F36 | Score needs a source | `cvss_base_score = 7.5`, no `cvss_source` | 3819 `chk_cvss_source` | 3819 `chk_cvss_source` is violated | Pass |
+| F37 | Source needs a score | `cvss_source = 'CNA'`, no score | 3819 `chk_cvss_source` | 3819 `chk_cvss_source` is violated | Pass |
+| F38 | Source ENUM | `cvss_source = 'VENDOR'` | 1265 data truncated | 1265 Data truncated for column 'cvss_source' | Pass |
 
-**35 / 35 rejected with the expected error.**
+**38 / 38 rejected with the expected error.**
+
+F02 and F03 pass a valid `cvss_source`, so the only rule they break is the score range, and that is the error MySQL reports.
 
 ## Results: statements that must succeed
 
 | ID | What it shows | Expected | Actual | Result |
 |---|---|---|---|---|
-| P01 | Valid CVE with score 9.8 and no severity; `trg_cve_bi` fills the band | `CRITICAL` | `CRITICAL` | PASS |
+| P01 | Valid CVE with score 9.8, source `CNA` and no severity; `trg_cve_bi` fills the band | `CRITICAL` | `CRITICAL` | PASS |
 | P02 | Re-scoring to 5.5; `trg_cve_bu` re-derives the band | `MEDIUM` | `MEDIUM` | PASS |
 | P03 | Valid KEV entry (flag + date + ransomware) | `1/2099-01-05/1` | `1/2099-01-05/1` | PASS |
 | P04 | Valid sub-technique with existing parent, JSON platforms, short-name tactic | 2 techniques | 2 | PASS |
@@ -92,6 +97,6 @@ Strict mode matters: without it MySQL stores an invalid ENUM value as `''` with 
 
 ## Screenshot
 
-Output of the run above (mysql client, `--force`, local test server on port 3309), rendered from the captured console output. Without `-vvv` the client prints only the errors and the result rows; every `ERROR` line is one F-test in file order.
+Output of the run above (mysql client, `--force`, local test server on port 3309, on a scratch database `tl_test` freshly loaded with 01-04), rendered from the captured console output. Without `-vvv` the client prints only the errors and the result rows; every `ERROR` line is one F-test in file order.
 
 ![constraint test run](screenshots/tests/constraint_tests_run.png)
