@@ -53,6 +53,7 @@ SELECT c.cve_id,
        c.cvss_base_score,
        c.cvss_severity,
        c.cvss_version,
+       c.cvss_source,
        c.is_kev,
        c.kev_date_added,
        GROUP_CONCAT(cc.cwe_id ORDER BY cc.cwe_id SEPARATOR ',') AS cwe_ids
