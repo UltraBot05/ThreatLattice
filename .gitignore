@@ -1,7 +1,29 @@
-node_modules/
+# secrets
 .env
 .env.local
 .env*.local
-.next/
+!.env.example
+
+# private course material
 handout/
+
+# data downloads (large, re-downloadable)
+data/raw/
+
+# node / next
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# misc
 *.log
+.DS_Store
+Thumbs.db
