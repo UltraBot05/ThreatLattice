@@ -14,7 +14,8 @@ import type { Role } from "@/lib/types";
  * - One generic error for unknown user, wrong password and deactivated user,
  *   so the response never reveals which usernames exist.
  * - An unknown user still costs one bcrypt compare (same timing).
- * - 5 failures per account in 15 minutes locks that account temporarily
+ * - 5 attempts per account in 15 minutes (counted before the bcrypt compare,
+ *   cleared on success) locks that account temporarily
  *   (keyed on the account, not the spoofable X-Forwarded-For header).
  * - Writes LOGIN / LOGIN_FAIL rows to audit_log and sets last_login_at.
  */
@@ -33,11 +34,14 @@ export const POST = route(async (req: NextRequest) => {
 
   const wait = lockedFor(key);
   if (wait > 0) throw tooManyRequests(`Too many failed attempts. Try again in ${wait} minute${wait === 1 ? "" : "s"}.`);
+  // Count the attempt NOW, before the slow bcrypt await. Check + count run
+  // with no await in between, so 50 parallel requests cannot all slip past
+  // the limit while earlier ones are still being hashed. Cleared on success.
+  recordFailure(key);
 
   const ok = await verifyPassword(body.password, row?.password_hash ?? DUMMY_HASH);
 
   if (!row || !ok || !row.is_active) {
-    recordFailure(key);
     // Unknown user: store NULL, never the typed text (it could be a password typed into the wrong box).
     await audit("LOGIN_FAIL", "app_user", row ? String(row.user_id) : null, row?.user_id ?? null, {
       reason: !row ? "unknown user" : !ok ? "wrong password" : "deactivated",
