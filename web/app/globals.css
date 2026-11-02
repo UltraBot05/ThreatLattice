@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/*
+ * ThreatLattice design tokens: "Declassified" (HANDOFF 4.10).
+ * Components use these through Tailwind classes (bg-ink-2, text-paper-dim,
+ * border-rule, text-hazard, font-display, font-mono ...) or var(--...).
+ * Never write raw hex in a component.
+ */
+@theme {
+  --color-ink: #0b0b0c;
+  --color-ink-2: #121214;
+  --color-ink-3: #1a1a1d;
+  --color-rail: #0e0e10;
+  --color-rule: #2a292d;
+  --color-rule-strong: #3a383d;
+  --color-paper: #ece8e1;
+  --color-paper-dim: #a29d94;
+  --color-paper-faint: #6c6862;
+  --color-redact: #000000;
+  --color-hazard: #ff4d2e;
+  --color-hazard-dim: #ff4d2e1f;
+  --color-sev-critical: #ff4d2e;
+  --color-sev-high: #f2a03d;
+  --color-sev-medium: #d8c690;
+  --color-sev-low: #8a9aa6;
+  --color-sev-none: #55535a;
+
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-xs: 2px;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 22px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-hazard);
+  color: var(--color-ink);
+}
+
+/* One visible focus style everywhere (keyboard only). */
+:focus-visible {
+  outline: 2px solid var(--color-hazard);
+  outline-offset: 2px;
+}
+
+/* Identifiers, scores, dates: mono with fixed-width digits. */
+.tl-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Small mono section/column labels: "01 / SEVERITY". */
+.tl-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-paper-dim);
+}
+
+/* Headlines are revealed by <Headline>; hidden until split to avoid a flash. */
+.tl-headline-pending {
+  visibility: hidden;
+}
+
+@keyframes tl-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.tl-pulse {
+  animation: tl-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tl-pulse { animation: none; }
+  .tl-headline-pending { visibility: visible; }
+}
