@@ -16,11 +16,12 @@ Key column: **PK** primary key, **FK** foreign key, **UQ** unique. Rows marked *
 
 ## Catalogue tables
 
-### `cwe` — weakness types (CWE Weaknesses and Categories)
+### `cwe` — weakness types (CWE Weaknesses and Groupings, formerly Categories)
 | Column | Type | Key | Null | Default | Constraints / notes |
 |---|---|---|---|---|---|
 | cwe_id | VARCHAR(12) | PK | no | | `chk_cwe_id`: `^CWE-[0-9]+$` |
-| name | VARCHAR(255) | | no | | |
+| name | VARCHAR(255) | | no | | Official CWE name |
+| common_name | VARCHAR(255) | | yes | | *v2*. Everyday name from CWE's `Alternate_Terms` (role Common-Name), e.g. `Cross-site Scripting`; NULL when CWE gives none. The UI shows it when present, else `name` |
 | abstraction | VARCHAR(20) | | yes | | Pillar, Class, Base, Variant, Compound, or `Category` |
 | status | VARCHAR(20) | | yes | | Stable, Draft, Incomplete, Deprecated, ... (deprecated rows are kept) |
 | description | TEXT | | yes | | |
@@ -36,6 +37,7 @@ Key column: **PK** primary key, **FK** foreign key, **UQ** unique. Rows marked *
 | cvss_severity | ENUM('NONE','LOW','MEDIUM','HIGH','CRITICAL') | | yes | | *v2* adds `NONE`. Filled from the score by trigger `trg_cve_bi`/`trg_cve_bu` when NULL; index `idx_cve_severity` |
 | cvss_vector | VARCHAR(255) | | yes | | *v2*: was 128; CVSS 4.0 vectors from NVD reach 178 chars. e.g. `CVSS:3.1/AV:N/AC:L/...` |
 | cvss_version | VARCHAR(4) | | yes | | *v2*. `chk_cvss_version`: `3.0`, `3.1` or `4.0` |
+| cvss_source | ENUM('NVD','CNA','ADP') | | yes | | *v2*. Who scored it: NVD's own analysis, the CVE's publisher (CNA, often the vendor), or CISA's ADP. `chk_cvss_source`: NULL exactly when `cvss_base_score` is NULL |
 | is_kev | BOOLEAN | | no | FALSE | *v2*. In CISA KEV; index `idx_cve_kev` |
 | kev_date_added | DATE | | yes | | *v2*. `chk_kev_date`: set if and only if `is_kev` is TRUE |
 | kev_ransomware | BOOLEAN | | no | FALSE | *v2*. `chk_kev_ransomware`: can be TRUE only when `is_kev` is TRUE |
