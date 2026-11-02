@@ -1,0 +1,22 @@
+{"type": "bundle", "id": "bundle--x", "objects": [
+  {"type": "attack-pattern", "id": "attack-pattern--1", "name": "Exploit Public-Facing Application",
+   "description": "Adversaries may attempt to exploit a weakness.",
+   "x_mitre_platforms": ["Linux", "Windows", "Containers"],
+   "kill_chain_phases": [{"kill_chain_name": "mitre-attack", "phase_name": "initial-access"}],
+   "external_references": [{"source_name": "mitre-attack", "external_id": "T1190"},
+                           {"source_name": "capec", "external_id": "CAPEC-66"}]},
+  {"type": "attack-pattern", "id": "attack-pattern--2", "name": "PowerShell", "x_mitre_is_subtechnique": true,
+   "kill_chain_phases": [{"kill_chain_name": "mitre-attack", "phase_name": "execution"}],
+   "external_references": [{"source_name": "mitre-attack", "external_id": "T1059.001"}]},
+  {"type": "attack-pattern", "id": "attack-pattern--3", "name": "Command and Scripting Interpreter",
+   "kill_chain_phases": [{"kill_chain_name": "mitre-attack", "phase_name": "execution"},
+                         {"kill_chain_name": "mitre-pre-attack", "phase_name": "ignored"}],
+   "external_references": [{"source_name": "mitre-attack", "external_id": "T1059"}]},
+  {"type": "attack-pattern", "id": "attack-pattern--4", "name": "Orphan Sub", "x_mitre_is_subtechnique": true,
+   "external_references": [{"source_name": "mitre-attack", "external_id": "T9999.001"}]},
+  {"type": "attack-pattern", "id": "attack-pattern--5", "name": "Revoked", "revoked": true,
+   "external_references": [{"source_name": "mitre-attack", "external_id": "T1000"}]},
+  {"type": "attack-pattern", "id": "attack-pattern--6", "name": "Deprecated", "x_mitre_deprecated": true,
+   "external_references": [{"source_name": "mitre-attack", "external_id": "T1001"}]},
+  {"type": "x-mitre-tactic", "id": "x-mitre-tactic--1", "name": "Execution", "x_mitre_shortname": "execution"}
+]}

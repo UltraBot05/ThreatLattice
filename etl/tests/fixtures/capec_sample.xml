@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Attack_Pattern_Catalog xmlns="http://capec.mitre.org/capec-3" Name="CAPEC" Version="3.9" Date="2023-01-24">
+  <Attack_Patterns>
+    <Attack_Pattern ID="66" Name="SQL Injection" Abstraction="Standard" Status="Draft">
+      <Description>This attack exploits target software that constructs <xhtml:b xmlns:xhtml="http://www.w3.org/1999/xhtml">SQL</xhtml:b>
+        statements based on user input.</Description>
+      <Likelihood_Of_Attack>High</Likelihood_Of_Attack>
+      <Typical_Severity>Very High</Typical_Severity>
+      <Related_Weaknesses>
+        <Related_Weakness CWE_ID="89"/>
+        <Related_Weakness CWE_ID="20"/>
+      </Related_Weaknesses>
+      <Taxonomy_Mappings>
+        <Taxonomy_Mapping Taxonomy_Name="WASC"><Entry_ID>19</Entry_ID></Taxonomy_Mapping>
+      </Taxonomy_Mappings>
+    </Attack_Pattern>
+    <Attack_Pattern ID="471" Name="Search Order Hijacking" Abstraction="Detailed" Status="Draft">
+      <Description>Hijack the search order.</Description>
+      <Likelihood_Of_Attack>Medium</Likelihood_Of_Attack>
+      <Typical_Severity>Sometimes</Typical_Severity>
+      <Related_Weaknesses><Related_Weakness CWE_ID="427"/></Related_Weaknesses>
+      <Taxonomy_Mappings>
+        <Taxonomy_Mapping Taxonomy_Name="ATTACK"><Entry_ID>1574.008</Entry_ID><Entry_Name>Path Interception</Entry_Name></Taxonomy_Mapping>
+        <Taxonomy_Mapping Taxonomy_Name="ATTACK"><Entry_ID>1574</Entry_ID></Taxonomy_Mapping>
+        <Taxonomy_Mapping Taxonomy_Name="ATTACK"><Entry_ID>bogus</Entry_ID></Taxonomy_Mapping>
+      </Taxonomy_Mappings>
+    </Attack_Pattern>
+    <Attack_Pattern ID="9" Name="Old Pattern" Abstraction="Detailed" Status="Deprecated">
+      <Description>Deprecated.</Description>
+    </Attack_Pattern>
+  </Attack_Patterns>
+</Attack_Pattern_Catalog>
