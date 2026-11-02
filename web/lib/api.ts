@@ -1,5 +1,5 @@
 import "server-only";
-import { NextResponse, type NextRequest } from "next/server";
+import { connection, NextResponse, type NextRequest } from "next/server";
 import { z, ZodError } from "zod";
 import { isMysqlError } from "@/lib/db/mysql";
 
@@ -8,7 +8,13 @@ import { isMysqlError } from "@/lib/db/mysql";
  * every error leaves in one shape:
  *   { "error": { "code": "...", "message": "..." } }
  */
-export type ApiErrorCode = "BAD_REQUEST" | "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "DB_ERROR";
+export type ApiErrorCode =
+  | "BAD_REQUEST"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "TOO_MANY_REQUESTS"
+  | "DB_ERROR";
 
 export class ApiError extends Error {
   constructor(
@@ -24,6 +30,7 @@ export const badRequest = (m: string) => new ApiError(400, "BAD_REQUEST", m);
 export const unauthorized = (m = "Sign in to continue.") => new ApiError(401, "UNAUTHORIZED", m);
 export const forbidden = (m = "You do not have access to this.") => new ApiError(403, "FORBIDDEN", m);
 export const notFound = (m = "Not found.") => new ApiError(404, "NOT_FOUND", m);
+export const tooManyRequests = (m: string) => new ApiError(429, "TOO_MANY_REQUESTS", m);
 
 function errorResponse(status: number, code: ApiErrorCode, message: string) {
   return NextResponse.json({ error: { code, message } }, { status });
@@ -51,9 +58,14 @@ export function toErrorResponse(err: unknown): NextResponse {
 
 type Handler<Ctx> = (req: NextRequest, ctx: Ctx) => Promise<Response>;
 
-/** Wrap a route handler so thrown errors become the standard error JSON. */
+/**
+ * Wrap a route handler so thrown errors become the standard error JSON.
+ * Also marks the handler as request-time only (connection()): our API reads
+ * cookies and the databases, so it must never be prerendered at build time.
+ */
 export function route<Ctx = unknown>(handler: Handler<Ctx>): Handler<Ctx> {
   return async (req, ctx) => {
+    await connection();
     try {
       return await handler(req, ctx);
     } catch (err) {
