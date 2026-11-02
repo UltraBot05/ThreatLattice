@@ -146,8 +146,9 @@ DELIMITER ;
 
 -- ---------------------------------------------------------------------
 -- Test calls (run by hand; expected results in the comments)
---   INSERT INTO cve (cve_id, description, published_date, cvss_base_score)
---   VALUES ('CVE-2026-900001', 'trigger test', '2026-10-01', 7.5);
+--   INSERT INTO cve (cve_id, description, published_date, cvss_base_score, cvss_source)
+--   VALUES ('CVE-2026-900001', 'trigger test', '2026-10-01', 7.5, 'NVD');
+--   (a score needs a cvss_source: chk_cvss_source)
 --   SELECT cvss_severity FROM cve WHERE cve_id = 'CVE-2026-900001';   -> HIGH
 --   UPDATE cve SET cvss_base_score = 9.8 WHERE cve_id = 'CVE-2026-900001';
 --   SELECT cvss_severity FROM cve WHERE cve_id = 'CVE-2026-900001';   -> CRITICAL
