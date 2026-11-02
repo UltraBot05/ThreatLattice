@@ -42,8 +42,8 @@ DELETE FROM cpe              WHERE vendor = 'tl-test-vendor';
 -- Fixtures: one valid row per table, used by the tests below.
 -- ---------------------------------------------------------------------
 INSERT INTO cwe (cwe_id, name) VALUES ('CWE-999001', 'Test weakness A'), ('CWE-999002', 'Test weakness B');
-INSERT INTO cve (cve_id, description, published_date, cvss_base_score)
-VALUES ('CVE-2099-0001', 'Test vulnerability', '2099-01-01', 5.0);
+INSERT INTO cve (cve_id, description, published_date, cvss_base_score, cvss_source)
+VALUES ('CVE-2099-0001', 'Test vulnerability', '2099-01-01', 5.0, 'NVD');
 INSERT INTO attack_technique (technique_id, name) VALUES ('T9990', 'Test technique');
 INSERT INTO cpe (vendor, product) VALUES ('tl-test-vendor', 'tl-test-product');
 INSERT INTO app_user (username, email, password_hash)
@@ -66,13 +66,13 @@ SELECT event_id INTO @ev FROM security_event WHERE slug = 'tl-test-event';
 -- Expected: ERROR 3819 Check constraint 'chk_cve_id' is violated.
 INSERT INTO cve (cve_id, description, published_date) VALUES ('CVE-99-1', 'bad id', '2099-01-01');
 
--- F02 CVSS score above 10.0.
+-- F02 CVSS score above 10.0 (with a valid source, so only the range is wrong).
 -- Expected: ERROR 3819 Check constraint 'chk_cvss_range' is violated.
-INSERT INTO cve (cve_id, description, published_date, cvss_base_score) VALUES ('CVE-2099-0002', 'score 11', '2099-01-01', 11.0);
+INSERT INTO cve (cve_id, description, published_date, cvss_base_score, cvss_source) VALUES ('CVE-2099-0002', 'score 11', '2099-01-01', 11.0, 'NVD');
 
 -- F03 Negative CVSS score.
 -- Expected: ERROR 3819 Check constraint 'chk_cvss_range' is violated.
-INSERT INTO cve (cve_id, description, published_date, cvss_base_score) VALUES ('CVE-2099-0003', 'score -1', '2099-01-01', -1.0);
+INSERT INTO cve (cve_id, description, published_date, cvss_base_score, cvss_source) VALUES ('CVE-2099-0003', 'score -1', '2099-01-01', -1.0, 'NVD');
 
 -- F04 Severity that is not in the ENUM.
 -- Expected: ERROR 1265 Data truncated for column 'cvss_severity'.
@@ -210,14 +210,27 @@ INSERT INTO event_cve (event_id, cve_id) VALUES (@ev, 'GITLAB-2026-1');
 -- Expected: ERROR 1452 Cannot add or update a child row: a foreign key constraint fails.
 INSERT INTO event_cve (event_id, cve_id) VALUES (999999999, 'CVE-2099-0001');
 
+-- ---- cve.cvss_source (added after HANDOFF v2) -----------------------
+-- F36 A score with no source (who scored it must be known).
+-- Expected: ERROR 3819 Check constraint 'chk_cvss_source' is violated.
+INSERT INTO cve (cve_id, description, published_date, cvss_base_score) VALUES ('CVE-2099-0036', 'no source', '2099-01-01', 7.5);
+
+-- F37 A source on an unscored CVE.
+-- Expected: ERROR 3819 Check constraint 'chk_cvss_source' is violated.
+INSERT INTO cve (cve_id, description, published_date, cvss_source) VALUES ('CVE-2099-0037', 'source only', '2099-01-01', 'CNA');
+
+-- F38 A source outside NVD/CNA/ADP.
+-- Expected: ERROR 1265 Data truncated for column 'cvss_source'.
+INSERT INTO cve (cve_id, description, published_date, cvss_base_score, cvss_source) VALUES ('CVE-2099-0038', 'bad source', '2099-01-01', 7.5, 'VENDOR');
+
 
 -- =====================================================================
 -- P: statements that MUST SUCCEED (each followed by a PASS/FAIL check)
 -- =====================================================================
 
--- P01 Valid CVE with a score but no severity: trg_cve_bi fills it.
-INSERT INTO cve (cve_id, description, published_date, cvss_base_score, cvss_version)
-VALUES ('CVE-2099-0100', 'valid scored CVE', '2099-01-01', 9.8, '3.1');
+-- P01 Valid CVE with a score (and its source) but no severity: trg_cve_bi fills it.
+INSERT INTO cve (cve_id, description, published_date, cvss_base_score, cvss_version, cvss_source)
+VALUES ('CVE-2099-0100', 'valid scored CVE', '2099-01-01', 9.8, '3.1', 'CNA');
 SELECT 'P01' AS test, cvss_severity AS actual, 'CRITICAL' AS expected,
        IF(cvss_severity = 'CRITICAL', 'PASS', 'FAIL') AS result
 FROM cve WHERE cve_id = 'CVE-2099-0100';
