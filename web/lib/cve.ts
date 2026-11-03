@@ -77,14 +77,24 @@ export interface StatsOverview {
   kevCount: number;
   /** From sp_severity_breakdown: CRITICAL..NONE, then UNSCORED. */
   bySeverity: { severity: Severity | "UNSCORED"; count: number; avg_score: number | null }[];
-  /** Always all years (the trend chart), whatever ?year= says. */
+  /** Always all years, whatever ?year= says. */
   byYear: { year: number; count: number }[];
-  topCwes: { cwe_id: string; name: string; common_name: string | null; count: number; avg_score: number | null }[];
+  /** "2026-10": all CVEs published that month, and how many of them are CRITICAL. Follows ?year=. */
+  byMonth: { month: string; count: number; critical: number }[];
+  topCwes: {
+    cwe_id: string;
+    name: string;
+    common_name: string | null;
+    count: number;
+    avg_score: number | null;
+    kev_count: number;
+  }[];
 }
 
 /** One row of GET /api/admin/audit. */
 export interface AuditRow {
   log_id: number;
+  /** ISO 8601 in UTC ("2026-11-02T18:27:26.000Z"), so the browser can show local and relative time. */
   ts: string;
   action: "INSERT" | "UPDATE" | "DELETE" | "LOGIN" | "LOGIN_FAIL" | "ROLE_CHANGE";
   entity: string;
