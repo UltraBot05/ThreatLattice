@@ -14,7 +14,8 @@ import type { Paged } from "@/lib/types";
  * changes) and from the auth API (LOGIN, LOGIN_FAIL). username is NULL when
  * the row has no user (unknown-user LOGIN_FAIL) or the user was deleted
  * (audit_log.user_id is ON DELETE SET NULL). idx_audit_action_ts / idx_audit_ts
- * cover both orderings.
+ * cover both orderings. ts is sent as ISO 8601 UTC, built from
+ * UNIX_TIMESTAMP(), so it is exact whatever the server's time zone is.
  */
 const ACTIONS = ["INSERT", "UPDATE", "DELETE", "LOGIN", "LOGIN_FAIL", "ROLE_CHANGE"] as const;
 
@@ -34,8 +35,8 @@ export const GET = route(async (req: NextRequest) => {
   const params = p.action ? [p.action] : [];
 
   const [items, count] = await Promise.all([
-    query<AuditRow>(
-      `SELECT a.log_id, a.ts, a.action, a.entity, a.entity_id, a.user_id, u.username, a.details
+    query<Omit<AuditRow, "ts"> & { ts_unix: number }>(
+      `SELECT a.log_id, UNIX_TIMESTAMP(a.ts) AS ts_unix, a.action, a.entity, a.entity_id, a.user_id, u.username, a.details
        FROM audit_log a LEFT JOIN app_user u ON u.user_id = a.user_id
        ${where}
        ORDER BY a.ts DESC, a.log_id DESC
@@ -45,6 +46,7 @@ export const GET = route(async (req: NextRequest) => {
     queryOne<{ total: number }>(`SELECT COUNT(*) AS total FROM audit_log a ${where}`, params),
   ]);
 
-  const body: Paged<AuditRow> = { items, total: count?.total ?? 0, page: p.page, pageSize: p.pageSize };
+  const rows: AuditRow[] = items.map(({ ts_unix, ...r }) => ({ ...r, ts: new Date(Number(ts_unix) * 1000).toISOString() }));
+  const body: Paged<AuditRow> = { items: rows, total: count?.total ?? 0, page: p.page, pageSize: p.pageSize };
   return Response.json(body, { headers: NO_STORE });
 });
