@@ -118,3 +118,13 @@ body {
 .tl-flow .react-flow__controls-button { background: var(--color-ink-2); border-bottom: 1px solid var(--color-rule); fill: var(--color-paper-dim); }
 .tl-flow .react-flow__controls-button:hover { background: var(--color-ink-3); }
 .tl-flow .react-flow__handle { opacity: 0; pointer-events: none; }
+
+/* Dropdown menu (components/ui/Select.tsx): a short drop-in, nothing on reduced motion. */
+@keyframes tl-pop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tl-select-content[data-state="open"] { animation: tl-pop 140ms var(--ease-out-expo); }
+@media (prefers-reduced-motion: reduce) {
+  .tl-select-content[data-state="open"] { animation: none; }
+}
