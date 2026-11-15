@@ -7,4 +7,5 @@ export { LogoMark } from "./Logo";
 export { Sidebar } from "./Sidebar";
 export { EmptyState, ErrorState } from "./States";
 export { KevTag, SeverityTag, SourceTag } from "./Tags";
+export { TextSize } from "./TextSize";
 export { IdText, PageHeader, Panel, SectionLabel } from "./Text";

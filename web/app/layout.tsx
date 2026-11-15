@@ -7,6 +7,7 @@ import "@fontsource/ibm-plex-sans/600.css";
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import "./globals.css";
+import { SCALE_BOOT_SCRIPT } from "@/components/ui/textScale";
 
 export const metadata: Metadata = {
   title: { default: "ThreatLattice", template: "%s | ThreatLattice" },
@@ -16,7 +17,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full">
+    // suppressHydrationWarning: the boot script sets --ui-scale on <html> before React hydrates.
+    <html lang="en" className="h-full" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SCALE_BOOT_SCRIPT }} />
+      </head>
       <body className="min-h-full bg-ink text-paper antialiased">{children}</body>
     </html>
   );
