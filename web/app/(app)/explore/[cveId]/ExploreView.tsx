@@ -12,6 +12,7 @@ import { useApi } from "@/lib/client/api";
 import type { ChainGraph as Chain, GraphNode } from "@/lib/graph";
 import { ChainGraph } from "../ChainGraph";
 import { NodePanel } from "../NodePanel";
+import { SaveInvestigation } from "../SaveInvestigation";
 
 /**
  * /explore/[cveId]?depth=0|1|2 : the attack chain for one CVE (B4).
@@ -75,8 +76,14 @@ export function ExploreView() {
         <h1 className="tl-mono text-[1.75rem] leading-tight text-paper sm:text-[2rem]">
           <DecodeText text={id} />
         </h1>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button size="sm" href={`/cve/${id}`}>CVE dossier</Button>
+          {chain ? (
+            <SaveInvestigation
+              cveId={id}
+              summary={`${chain.meta.counts.cwe} weaknesses, ${chain.meta.counts.capec} attack patterns, ${chain.meta.counts.technique} ATT&CK techniques (parent levels: ${depth}).`}
+            />
+          ) : null}
         </div>
       </div>
       <p className="mt-2 max-w-[75ch] text-[0.8125rem] text-paper-dim">
