@@ -95,15 +95,23 @@ CREATE TRIGGER trg_inv_au
 AFTER UPDATE ON investigation
 FOR EACH ROW
 BEGIN
-    INSERT INTO audit_log (user_id, action, entity, entity_id, details)
-    VALUES (NEW.user_id, 'UPDATE', 'investigation', NEW.investigation_id,
-            JSON_OBJECT(
-                'before', JSON_OBJECT('title', OLD.title, 'notes', OLD.notes,
-                                      'start_node_type', OLD.start_node_type,
-                                      'start_node_id',   OLD.start_node_id),
-                'after',  JSON_OBJECT('title', NEW.title, 'notes', NEW.notes,
-                                      'start_node_type', NEW.start_node_type,
-                                      'start_node_id',   NEW.start_node_id)));
+    -- Only log a real change. A save with identical values (or a change to
+    -- updated_at alone) would otherwise add an UPDATE row whose before and
+    -- after are the same. <=> is the NULL-safe equality (notes can be NULL).
+    IF NOT (NEW.title           <=> OLD.title
+        AND NEW.notes           <=> OLD.notes
+        AND NEW.start_node_type <=> OLD.start_node_type
+        AND NEW.start_node_id   <=> OLD.start_node_id) THEN
+        INSERT INTO audit_log (user_id, action, entity, entity_id, details)
+        VALUES (NEW.user_id, 'UPDATE', 'investigation', NEW.investigation_id,
+                JSON_OBJECT(
+                    'before', JSON_OBJECT('title', OLD.title, 'notes', OLD.notes,
+                                          'start_node_type', OLD.start_node_type,
+                                          'start_node_id',   OLD.start_node_id),
+                    'after',  JSON_OBJECT('title', NEW.title, 'notes', NEW.notes,
+                                          'start_node_type', NEW.start_node_type,
+                                          'start_node_id',   NEW.start_node_id)));
+    END IF;
 END $$
 
 -- DELETE: only OLD exists. The title is copied into details because the

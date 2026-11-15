@@ -289,6 +289,18 @@ SELECT 'P07' AS test,
           'PASS', 'FAIL') AS result;
 
 
+-- P08 trg_inv_au logs only real changes: saving identical values adds no
+-- UPDATE row; changing the notes adds exactly one.
+UPDATE investigation SET title = title, notes = notes WHERE investigation_id = @inv;
+SET @p08_noop = (SELECT COUNT(*) FROM audit_log
+                 WHERE entity = 'investigation' AND entity_id = @inv AND action = 'UPDATE');
+UPDATE investigation SET notes = 'changed notes' WHERE investigation_id = @inv;
+SET @p08_real = (SELECT COUNT(*) FROM audit_log
+                 WHERE entity = 'investigation' AND entity_id = @inv AND action = 'UPDATE');
+SELECT 'P08' AS test, CONCAT('no-op=', @p08_noop, ', real=', @p08_real) AS actual,
+       'no-op=0, real=1' AS expected,
+       IF(@p08_noop = 0 AND @p08_real = 1, 'PASS', 'FAIL') AS result;
+
 -- ---------------------------------------------------------------------
 -- Cleanup: remove every test row so real data is untouched.
 -- ---------------------------------------------------------------------

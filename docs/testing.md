@@ -7,7 +7,7 @@ Test file: [`db/mysql/tests/constraint_tests.sql`](../db/mysql/tests/constraint_
 The database must reject bad data by itself, whatever client sends it (the web API, the ETL scripts, or someone at the MySQL console). The API validates input too (zod), but these tests skip the API and talk straight to MySQL, so the only thing that can stop bad data here is the schema: CHECK constraints, ENUM types, NOT NULL, PRIMARY KEY / UNIQUE, FOREIGN KEY, the JSON type, and the `SIGNAL` checks inside `sp_create_investigation`.
 
 - **F-tests**: 38 statements that must **fail**, each with its expected error written above it in the file.
-- **P-tests**: 7 statements that must **succeed**, each followed by a `SELECT` that prints `PASS` or `FAIL`. They prove the constraints do not block valid data, and that the triggers and the procedure do their job.
+- **P-tests**: 8 statements that must **succeed**, each followed by a `SELECT` that prints `PASS` or `FAIL`. They prove the constraints do not block valid data, and that the triggers and the procedure do their job.
 
 ## How to run
 
@@ -86,8 +86,9 @@ F02 and F03 pass a valid `cvss_source`, so the only rule they break is the score
 | P05 | `sp_create_investigation` valid call: returns id, writes one audit row (trigger, same transaction) | id not NULL, 1 audit row | id=2, 1 audit row | PASS |
 | P06 | The four failed procedure calls (F25–F28) rolled back completely | 1 investigation for the test users | 1 | PASS |
 | P07 | Event CVE not yet in NVD (no FK on purpose) and a one-day event | 1 event_cve, 1 one-day event | 1, 1 | PASS |
+| P08 | `trg_inv_au` logs only real changes: an UPDATE with identical values adds no audit row, a notes change adds one | no-op=0, real=1 | [[run]] | [[run]] |
 
-**7 / 7 passed.**
+**8 / 8 passed** (P08 added after the run above; fill in its result after re-running the file).
 
 ## Observations
 
