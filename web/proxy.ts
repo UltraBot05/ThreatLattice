@@ -1,11 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { safeNext } from "@/lib/auth/redirect";
 import { readSessionToken, SESSION_COOKIE } from "@/lib/auth/token";
 
 /**
  * Optimistic page guard (Next 16 "proxy", formerly middleware).
  * - App pages need a valid session cookie, else -> /login?next=<page>.
  * - /admin pages need the admin role in the token, else -> /dashboard.
- * - Signed-in users visiting /login or /register go to /dashboard.
+ * - Signed-in users visiting /login or /register go straight to ?next=
+ *   (same-site only, via safeNext), else /dashboard.
  * This only improves navigation. The real check is requireUser()/requireRole()
  * in every API route, which also re-reads the user from MySQL.
  */
@@ -16,7 +18,7 @@ export async function proxy(req: NextRequest) {
   const user = await readSessionToken(req.cookies.get(SESSION_COOKIE)?.value);
 
   if ((pathname === "/login" || pathname === "/register") && user) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL(safeNext(req.nextUrl.searchParams.get("next")), req.url));
   }
 
   const isProtected = PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));

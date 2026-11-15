@@ -44,8 +44,8 @@ export default function Home() {
             techniques attackers use, in one step.
           </p>
           <div className="flex flex-wrap gap-2">
-            <Link href="/login?next=/dashboard" className={buttonClass("primary")}>Open the console</Link>
-            <Link href="/login?next=/spotlight/black-october-2026" className={buttonClass("secondary")}>Black October 2026</Link>
+            <Link href="/dashboard" className={buttonClass("primary")}>Open the console</Link>
+            <Link href="/spotlight/black-october-2026" className={buttonClass("secondary")}>Black October 2026</Link>
           </div>
         </section>
 
@@ -69,7 +69,7 @@ export default function Home() {
           <RevealOnScroll className="mt-8 flex flex-col items-start gap-5">
             <p className="tl-label text-hazard">SPOTLIGHT</p>
             <h2 className="max-w-[24ch] font-display text-[2.5rem] leading-tight">Black October: eight disclosures, one month, followed to their techniques.</h2>
-            <Link href="/login?next=/spotlight/black-october-2026" className={buttonClass("primary")}>Read the spotlight</Link>
+            <Link href="/spotlight/black-october-2026" className={buttonClass("primary")}>Read the spotlight</Link>
           </RevealOnScroll>
         </section>
 
