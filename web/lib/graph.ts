@@ -147,16 +147,22 @@ export function typeOfId(id: string): NodeType | null {
   return LABEL_FOR_ID.find(([re]) => re.test(id))?.[1] ?? null;
 }
 
-const SHORTEST = (fromLabel: NodeType, toLabel: NodeType) => `
-MATCH (a:${fromLabel} {id: $from}), (b:${toLabel} {id: $to})
-MATCH p = shortestPath((a)-[:INSTANCE_OF|CHILD_OF|EXPLOITS|ENABLES|SUBTECHNIQUE_OF*..8]-(b))
-RETURN [n IN nodes(p) | n { .*, kind: labels(n)[0] }] AS nodes,
-       [r IN relationships(p) | { source: startNode(r).id, target: endNode(r).id, type: type(r) }] AS rels`;
+const CATALOGUE_LINKS = "CHILD_OF|EXPLOITS|ENABLES|SUBTECHNIQUE_OF";
+const PROJECT = (v: string) => `${v} { .*, kind: labels(${v})[0] }`;
 
 /**
- * Shortest connection between any two catalogue entries (relationship
- * direction ignored, so read it as "how are these connected", not an
- * attack order). null = one end missing or no path within 8 hops.
+ * Shortest connection between two catalogue entries (relationship direction
+ * ignored, so read it as "how are these connected", not an attack order).
+ *
+ * The path walks catalogue links only (CHILD_OF, EXPLOITS, ENABLES,
+ * SUBTECHNIQUE_OF). INSTANCE_OF is used only at a CVE END, never in the
+ * middle: otherwise 154k CVEs act as shortcuts between any two weaknesses
+ * (CWE-416 -> some unrelated CVE -> CWE-693) and the answer says nothing.
+ * A CVE end is therefore expanded to its CWEs first; the shortest catalogue
+ * path between any start CWE and end node wins. (Filtering CVEs out with a
+ * WHERE on shortestPath forces Neo4j into an exhaustive search: minutes.)
+ *
+ * null = an end is missing or nothing connects within 8 hops.
  */
 export async function getShortestPath(
   from: string,
@@ -164,10 +170,63 @@ export async function getShortestPath(
 ): Promise<{ nodes: GraphNode[]; edges: GraphEdge[]; hops: number } | null> {
   const fl = typeOfId(from);
   const tl = typeOfId(to);
-  if (!fl || !tl) return null;
+  if (!fl || !tl || from === to) return null;
   // Labels come from the fixed whitelist above, never from user text.
-  const rows = await runCypher<{ nodes: Raw[]; rels: GraphEdge[] }>(SHORTEST(fl, tl), { from, to });
+  const start = fl === "CVE" ? "(a:CVE {id: $from})-[:INSTANCE_OF]->(s:CWE)" : `(s:${fl} {id: $from})`;
+  const end = tl === "CVE" ? "(t:CWE)<-[:INSTANCE_OF]-(b:CVE {id: $to})" : `(t:${tl} {id: $to})`;
+  const head = fl === "CVE" ? "[a] + " : "";
+  const tail = tl === "CVE" ? " + [b]" : "";
+
+  // Two CVEs sharing a weakness: CVE -> CWE <- CVE, no catalogue hop needed.
+  if (fl === "CVE" && tl === "CVE") {
+    const shared = await runCypher<{ nodes: Raw[] }>(
+      `MATCH (a:CVE {id: $from})-[:INSTANCE_OF]->(s:CWE)<-[:INSTANCE_OF]-(b:CVE {id: $to})
+       RETURN [${PROJECT("a")}, ${PROJECT("s")}, ${PROJECT("b")}] AS nodes LIMIT 1`,
+      { from, to },
+    );
+    if (shared[0]) {
+      const [a, w, b] = shared[0].nodes;
+      return {
+        nodes: shared[0].nodes.map(toNode),
+        edges: [
+          { source: a.id, target: w.id, type: "INSTANCE_OF" },
+          { source: b.id, target: w.id, type: "INSTANCE_OF" },
+        ],
+        hops: 2,
+      };
+    }
+  }
+
+  // A CVE and one of its own weaknesses: a single INSTANCE_OF hop.
+  if ((fl === "CVE") !== (tl === "CVE")) {
+    const [cve, cwe] = fl === "CVE" ? [from, to] : [to, from];
+    const direct = await runCypher<{ v: Raw; w: Raw }>(
+      `MATCH (v:CVE {id: $cve})-[:INSTANCE_OF]->(w:CWE {id: $cwe}) RETURN ${PROJECT("v")} AS v, ${PROJECT("w")} AS w`,
+      { cve, cwe },
+    );
+    if (direct[0]) {
+      const ns = fl === "CVE" ? [direct[0].v, direct[0].w] : [direct[0].w, direct[0].v];
+      return { nodes: ns.map(toNode), edges: [{ source: cve, target: cwe, type: "INSTANCE_OF" }], hops: 1 };
+    }
+  }
+
+  const rows = await runCypher<{ nodes: Raw[]; rels: GraphEdge[] }>(
+    `MATCH ${start}
+     MATCH ${end}
+     WHERE s <> t
+     MATCH p = shortestPath((s)-[:${CATALOGUE_LINKS}*..8]-(t))
+     WITH ${fl === "CVE" ? "a, " : ""}${tl === "CVE" ? "b, " : ""}p ORDER BY length(p) LIMIT 1
+     WITH ${head}nodes(p)${tail} AS ns, [r IN relationships(p) | { source: startNode(r).id, target: endNode(r).id, type: type(r) }] AS rels
+     RETURN [n IN ns | ${PROJECT("n")}] AS nodes, rels`,
+    { from, to },
+  );
   const row = rows[0];
   if (!row) return null;
-  return { nodes: row.nodes.map(toNode), edges: row.rels, hops: row.rels.length };
+  const edges: GraphEdge[] = [...row.rels];
+  if (fl === "CVE") edges.unshift({ source: row.nodes[0].id, target: row.nodes[1].id, type: "INSTANCE_OF" });
+  if (tl === "CVE") {
+    const n = row.nodes.length;
+    edges.push({ source: row.nodes[n - 1].id, target: row.nodes[n - 2].id, type: "INSTANCE_OF" });
+  }
+  return { nodes: row.nodes.map(toNode), edges, hops: edges.length };
 }
