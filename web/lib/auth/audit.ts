@@ -2,12 +2,12 @@ import "server-only";
 import { execute } from "@/lib/db/mysql";
 
 /**
- * Application-side audit rows (LOGIN, LOGIN_FAIL). Investigation and role
+ * Application-side audit rows (LOGIN, LOGIN_FAIL, account changes). Investigation and role
  * changes are logged by database triggers instead (04_triggers.sql).
  * Never throws: a failed audit write must not block signing in.
  */
 export async function audit(
-  action: "LOGIN" | "LOGIN_FAIL" | "INSERT",
+  action: "LOGIN" | "LOGIN_FAIL" | "INSERT" | "UPDATE",
   entity: string,
   entityId: string | null,
   userId: number | null,
