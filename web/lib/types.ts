@@ -31,3 +31,19 @@ export interface Paged<T> {
 export interface ApiErrorBody {
   error: { code: string; message: string };
 }
+
+/** Investigations (B5). */
+export const START_TYPES = ["CVE", "CWE", "CAPEC", "TECHNIQUE"] as const;
+export type StartType = (typeof START_TYPES)[number];
+
+export interface Investigation {
+  investigation_id: number;
+  user_id: number;
+  owner: string;
+  title: string;
+  start_node_type: StartType;
+  start_node_id: string;
+  notes: string | null;
+  created_at: string; // ISO 8601 UTC
+  updated_at: string | null;
+}
