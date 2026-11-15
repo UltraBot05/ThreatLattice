@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
+import { useRemPx } from "@/components/ui/useRemPx";
 import type { StatsOverview } from "@/lib/cve";
 import { fmtInt, fmtMonth } from "../_shared/format";
 
@@ -18,7 +19,9 @@ import { fmtInt, fmtMonth } from "../_shared/format";
  */
 type Month = StatsOverview["byMonth"][number];
 
-const AXIS = { fontFamily: "var(--font-mono)", fontSize: 11, fill: "var(--color-paper-faint)" };
+/* Recharts takes SVG numbers, not rem, so axis sizes are computed from the
+   current root size (useRemPx) and follow the Text size control. */
+const axis = (rem: number) => ({ fontFamily: "var(--font-mono)", fontSize: 0.6875 * rem, fill: "var(--color-paper-faint)" });
 
 function Tip({ active, payload }: { active?: boolean; payload?: { payload: Month }[] }) {
   if (!active || !payload?.length) return null;
@@ -34,6 +37,8 @@ function Tip({ active, payload }: { active?: boolean; payload?: { payload: Month
 
 export function OverTimeChart({ months: all }: { months: Month[] }) {
   const [asTable, setAsTable] = useState(false);
+  const rem = useRemPx();
+  const AXIS = axis(rem);
   const now = new Date();
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const partial = all.find((m) => m.month === thisMonth) ?? null;
@@ -85,7 +90,7 @@ export function OverTimeChart({ months: all }: { months: Month[] }) {
       ) : (
         <div className="h-[15rem] w-full" role="img" aria-label={`CVEs per month, ${months.length} months. Use Show table for the numbers.`}>
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={months} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+            <ComposedChart data={months} margin={{ top: 0.5 * rem, right: 2.25 * rem, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--color-rule)" vertical={false} />
               <XAxis
                 dataKey="month"
@@ -93,9 +98,9 @@ export function OverTimeChart({ months: all }: { months: Month[] }) {
                 tick={AXIS}
                 axisLine={{ stroke: "var(--color-rule)" }}
                 tickLine={false}
-                minTickGap={24}
+                minTickGap={1.5 * rem}
               />
-              <YAxis tick={AXIS} axisLine={false} tickLine={false} width={48} tickFormatter={(n: number) => fmtInt(n)} />
+              <YAxis tick={AXIS} axisLine={false} tickLine={false} width={3.25 * rem} tickFormatter={(n: number) => fmtInt(n)} />
               <Tooltip content={<Tip />} cursor={{ stroke: "var(--color-rule-strong)" }} isAnimationActive={false} />
               <Area
                 type="linear"

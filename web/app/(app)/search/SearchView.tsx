@@ -180,14 +180,14 @@ export function SearchView() {
           </div>
         </fieldset>
 
-        <div className="flex items-end gap-2">
-          <label className="flex flex-col gap-1.5">
+        <div className="flex w-full items-end gap-2 sm:w-auto">
+          <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-none">
             <span className="tl-label">Published from</span>
-            <Input type="date" value={get("from")} onChange={(e) => update({ from: e.target.value })} className="w-[9.375rem] tl-mono" />
+            <Input type="date" value={get("from")} onChange={(e) => update({ from: e.target.value })} className="w-full sm:w-[9.375rem] tl-mono" />
           </label>
-          <label className="flex flex-col gap-1.5">
+          <label className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-none">
             <span className="tl-label">to</span>
-            <Input type="date" value={get("to")} onChange={(e) => update({ to: e.target.value })} className="w-[9.375rem] tl-mono" />
+            <Input type="date" value={get("to")} onChange={(e) => update({ to: e.target.value })} className="w-full sm:w-[9.375rem] tl-mono" />
           </label>
         </div>
 
@@ -255,6 +255,7 @@ export function SearchView() {
                 key: "date",
                 header: "Published",
                 width: "6.5rem",
+                hideBelow: 37,
                 render: (r) => <span className="tl-mono text-xs text-paper-dim">{fmtDate(r.published_date)}</span>,
               },
               { key: "kev", header: "KEV", width: "3rem", render: (r) => (r.is_kev ? <KevTag compact /> : null) },
@@ -262,6 +263,7 @@ export function SearchView() {
                 key: "cwe",
                 header: "CWE",
                 width: "6rem",
+                hideBelow: 44,
                 render: (r) => (
                   <span className="tl-mono text-xs text-paper-dim" title={r.cwes.join(", ")}>
                     {r.cwes[0] ?? <span className="text-paper-faint">none</span>}
