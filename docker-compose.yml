@@ -51,6 +51,32 @@ services:
       timeout: 5s
       retries: 30
 
+  # Keeps the data current (B8): re-downloads NVD, KEV, CWE, CAPEC and ATT&CK
+  # and reloads MySQL + Neo4j every TL_REFRESH_DAYS (default 3.5). On a fresh
+  # volume (no CVEs yet) it does the first full load by itself.
+  #   docker compose logs -f refresher                          # watch it
+  #   docker compose run --rm refresher python -m etl.refresh --once   # refresh now
+  refresher:
+    build:
+      context: .
+      dockerfile: etl/Dockerfile
+    container_name: threatlattice-refresher
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      NEO4J_URI: bolt://neo4j:7687
+      TL_RAW_DIR: /app/data/raw
+      TL_REFRESH_DAYS: ${TL_REFRESH_DAYS:-3.5}
+    volumes:
+      - ./data/raw:/app/data/raw
+    depends_on:
+      mysql:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+
 volumes:
   mysql-data:
   neo4j-data:

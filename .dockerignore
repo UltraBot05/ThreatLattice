@@ -1,0 +1,9 @@
+# Only etl/ and db/neo4j are copied into the refresher image.
+web
+data
+handout
+docs
+.git
+.env
+**/__pycache__
+**/node_modules
