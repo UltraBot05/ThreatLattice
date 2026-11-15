@@ -15,7 +15,7 @@ const variants: Record<Variant, string> = {
   secondary: "border border-rule-strong text-paper hover:bg-ink-3",
   ghost: "text-paper-dim hover:text-paper hover:bg-ink-3",
 };
-const sizes: Record<Size, string> = { sm: "h-7 px-2.5 text-xs", md: "h-9 px-3.5 text-[13px]" };
+const sizes: Record<Size, string> = { sm: "h-7 px-2.5 text-xs", md: "h-9 px-3.5 text-[0.8125rem]" };
 
 export function buttonClass(variant: Variant = "secondary", size: Size = "md", extra = "") {
   return `${base} ${variants[variant]} ${sizes[size]} ${extra}`;

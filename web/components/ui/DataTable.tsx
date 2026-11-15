@@ -67,7 +67,7 @@ export function DataTable<T>({
       tabIndex={interactive ? 0 : -1}
       onClick={interactive ? () => open(row) : undefined}
       onKeyDown={interactive ? (e) => onKey(e, row) : undefined}
-      className={`grid min-h-9 items-center gap-3 border-b border-rule px-1 py-1.5 text-[13px] ${
+      className={`grid min-h-9 items-center gap-3 border-b border-rule px-1 py-1.5 text-[0.8125rem] ${
         interactive ? "cursor-pointer hover:bg-ink-3 focus-visible:bg-ink-3" : ""
       }`}
       style={{ gridTemplateColumns: template }}

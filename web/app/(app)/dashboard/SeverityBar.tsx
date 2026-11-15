@@ -37,14 +37,14 @@ export function SeverityBar({ rows, total }: { rows: StatsOverview["bySeverity"]
       <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-6" aria-label="CVEs by severity">
         {groups.map((g) => (
           <li key={g.s} className="flex items-start gap-2">
-            <span aria-hidden="true" className={`mt-1 h-3 w-[3px] shrink-0 ${STYLE[g.s].bar}`} />
+            <span aria-hidden="true" className={`mt-1 h-3 w-[0.1875rem] shrink-0 ${STYLE[g.s].bar}`} />
             <span className="min-w-0">
-              <span className="block text-[13px] text-paper">{STYLE[g.s].label}</span>
+              <span className="block text-[0.8125rem] text-paper">{STYLE[g.s].label}</span>
               <span className="tl-mono block text-xs text-paper-dim">
                 {fmtInt(g.count)} <span className="text-paper-faint">{fmtPct(g.count, total)}</span>
               </span>
               {g.avg != null && g.s !== "NONE" ? (
-                <span className="tl-mono block text-[11px] text-paper-faint">avg {g.avg.toFixed(1)}</span>
+                <span className="tl-mono block text-[0.6875rem] text-paper-faint">avg {g.avg.toFixed(1)}</span>
               ) : null}
             </span>
           </li>

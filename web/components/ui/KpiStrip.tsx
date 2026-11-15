@@ -20,7 +20,7 @@ export function KpiStrip({ items }: { items: Kpi[] }) {
           <p className={`mt-1 text-2xl ${k.tone === "hazard" ? "text-hazard" : "text-paper"}`}>
             <CountUp value={k.value} />
           </p>
-          {k.hint ? <p className="mt-0.5 text-[11px] text-paper-faint">{k.hint}</p> : null}
+          {k.hint ? <p className="mt-0.5 text-[0.6875rem] text-paper-faint">{k.hint}</p> : null}
         </div>
       ))}
     </div>

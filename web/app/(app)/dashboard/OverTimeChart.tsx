@@ -48,7 +48,7 @@ export function OverTimeChart({ months: all }: { months: Month[] }) {
             <span aria-hidden="true" className="h-2.5 w-2.5 bg-paper-dim/40" /> All CVEs
           </span>
           <span className="flex items-center gap-1.5">
-            <span aria-hidden="true" className="h-[2px] w-3 bg-hazard" /> Critical
+            <span aria-hidden="true" className="h-[0.125rem] w-3 bg-hazard" /> Critical
           </span>
         </p>
         <Button size="sm" variant="ghost" aria-pressed={asTable} onClick={() => setAsTable((v) => !v)}>
@@ -72,18 +72,18 @@ export function OverTimeChart({ months: all }: { months: Month[] }) {
                 </span>
               ),
             },
-            { key: "c", header: "CVEs", align: "right", width: "120px", render: (m) => <span className="tl-mono">{fmtInt(m.count)}</span> },
+            { key: "c", header: "CVEs", align: "right", width: "7.5rem", render: (m) => <span className="tl-mono">{fmtInt(m.count)}</span> },
             {
               key: "k",
               header: "Critical",
               align: "right",
-              width: "120px",
+              width: "7.5rem",
               render: (m) => <span className="tl-mono text-hazard">{fmtInt(m.critical)}</span>,
             },
           ]}
         />
       ) : (
-        <div className="h-[240px] w-full" role="img" aria-label={`CVEs per month, ${months.length} months. Use Show table for the numbers.`}>
+        <div className="h-[15rem] w-full" role="img" aria-label={`CVEs per month, ${months.length} months. Use Show table for the numbers.`}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={months} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--color-rule)" vertical={false} />
@@ -112,7 +112,7 @@ export function OverTimeChart({ months: all }: { months: Month[] }) {
         </div>
       )}
       {partial && !asTable ? (
-        <p className="tl-mono mt-2 text-[11px] text-paper-faint">
+        <p className="tl-mono mt-2 text-[0.6875rem] text-paper-faint">
           {fmtMonth(partial.month)} so far: {fmtInt(partial.count)} CVEs, {fmtInt(partial.critical)} critical (month not over, not plotted)
         </p>
       ) : null}

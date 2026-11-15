@@ -17,6 +17,7 @@ import {
   type Icon,
 } from "@phosphor-icons/react";
 import { LogoMark } from "./Logo";
+import { TextSize } from "./TextSize";
 
 /**
  * App navigation (HANDOFF 4.10 "Sidebar").
@@ -142,7 +143,7 @@ export function Sidebar() {
     <nav aria-label="Main" className="flex flex-col">
       {groups.map((g) => (
         <div key={g.label}>
-          <p className={`tl-label px-[18px] pb-1.5 pt-3.5 text-[10px] tracking-[0.1em] text-paper-faint ${compact ? "lg:block hidden" : ""}`}>
+          <p className={`tl-label px-[1.125rem] pb-1.5 pt-3.5 text-[0.625rem] tracking-[0.1em] text-paper-faint ${compact ? "lg:block hidden" : ""}`}>
             {g.label}
           </p>
           {g.items.map((item) => {
@@ -154,7 +155,7 @@ export function Sidebar() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 title={item.label}
-                className={`mx-2 my-px flex items-center gap-2.5 rounded-[2px] px-2.5 py-[7px] text-[13px] transition-colors duration-150 ${
+                className={`mx-2 my-px flex items-center gap-2.5 rounded-[2px] px-2.5 py-[0.4375rem] text-[0.8125rem] transition-colors duration-150 ${
                   active
                     ? "bg-ink-3 text-paper shadow-[inset_2px_0_0_var(--color-hazard)]"
                     : "text-paper-dim hover:bg-ink-2 hover:text-paper"
@@ -165,7 +166,7 @@ export function Sidebar() {
                 {item.live ? (
                   <span aria-label="live" className={`tl-pulse ml-auto h-1.5 w-1.5 rounded-full bg-hazard ${compact ? "hidden lg:block" : ""}`} />
                 ) : item.keys ? (
-                  <span className={`tl-mono ml-auto text-[10px] text-paper-faint ${compact ? "hidden lg:inline" : ""}`}>{item.keys}</span>
+                  <span className={`tl-mono ml-auto text-[0.625rem] text-paper-faint ${compact ? "hidden lg:inline" : ""}`}>{item.keys}</span>
                 ) : null}
               </Link>
             );
@@ -185,25 +186,26 @@ export function Sidebar() {
           placeholder="Jump to CVE"
           className="w-full bg-transparent text-paper outline-none placeholder:text-paper-faint focus-visible:outline-none"
         />
-        <kbd className="tl-mono border border-rule-strong px-1 text-[10px] text-paper-faint">/</kbd>
+        <kbd className="tl-mono border border-rule-strong px-1 text-[0.625rem] text-paper-faint">/</kbd>
       </label>
     </form>
   );
 
   const footer = (compact: boolean) => (
     <div className={`mt-auto border-t border-rule px-4 py-3 ${compact ? "hidden lg:block" : ""}`}>
-      <p className="tl-mono flex items-center gap-1.5 text-[10px] text-paper-faint">
+      <TextSize className="mb-3" />
+      <p className="tl-mono flex items-center gap-1.5 text-[0.625rem] text-paper-faint">
         <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-sev-low" />
         {asOf === undefined ? "CHECKING DATA" : daysAgo(asOf)}
       </p>
       {me ? (
         <div className="mt-2.5 flex items-center gap-2">
-          <span className="tl-mono flex h-[26px] w-[26px] items-center justify-center border border-rule-strong text-[11px]">
+          <span className="tl-mono flex h-[1.625rem] w-[1.625rem] items-center justify-center border border-rule-strong text-[0.6875rem]">
             {me.username.slice(0, 2).toUpperCase()}
           </span>
           <span className="min-w-0 text-xs leading-tight">
             <span className="block truncate">{me.username}</span>
-            <span className="tl-mono text-[10px] uppercase text-paper-dim">{me.role}</span>
+            <span className="tl-mono text-[0.625rem] uppercase text-paper-dim">{me.role}</span>
           </span>
           <button onClick={signOut} aria-label="Sign out" className="ml-auto text-paper-faint hover:text-paper">
             <SignOut size={16} />
@@ -218,16 +220,16 @@ export function Sidebar() {
   );
 
   const brand = (compact: boolean) => (
-    <Link href="/" className={`flex items-center gap-2.5 px-[18px] pb-3.5 pt-4 ${compact ? "justify-center lg:justify-start px-0 lg:px-[18px]" : ""}`}>
+    <Link href="/" className={`flex items-center gap-2.5 px-[1.125rem] pb-3.5 pt-4 ${compact ? "justify-center lg:justify-start px-0 lg:px-[1.125rem]" : ""}`}>
       <LogoMark />
-      <span className={`font-display text-[21px] leading-none ${compact ? "hidden lg:inline" : ""}`}>ThreatLattice</span>
+      <span className={`font-display text-[1.3125rem] leading-none ${compact ? "hidden lg:inline" : ""}`}>ThreatLattice</span>
     </Link>
   );
 
   return (
     <>
       {/* tablet + desktop rail */}
-      <aside className="sticky top-0 hidden h-dvh w-14 shrink-0 flex-col border-r border-rule bg-rail md:flex lg:w-[196px]">
+      <aside className="sticky top-0 hidden h-dvh w-14 shrink-0 flex-col border-r border-rule bg-rail md:flex lg:w-[12.25rem]">
         {brand(true)}
         {jump(true)}
         <div className="min-h-0 flex-1 overflow-y-auto">{nav(true)}</div>

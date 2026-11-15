@@ -37,13 +37,23 @@
   color-scheme: dark;
 }
 
+/*
+ * UI scale. Every size in the app is in rem, so this one value scales the
+ * whole interface (text, spacing, sidebar, tables) without touching layout
+ * breakpoints. Set by the Text size control (components/ui/TextSize.tsx),
+ * remembered per browser. Default 1.2 = 19.2px root.
+ */
+html {
+  font-size: calc(100% * var(--ui-scale, 1.2));
+}
+
 html,
 body {
   background: var(--color-ink);
   color: var(--color-paper);
   font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 22px;
+  font-size: 0.875rem;
+  line-height: 1.375rem;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -67,8 +77,8 @@ body {
 /* Small mono section/column labels: "01 / SEVERITY". */
 .tl-label {
   font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 0.6875rem;
+  line-height: 1rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-paper-dim);

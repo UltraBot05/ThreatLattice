@@ -1,7 +1,7 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
 
 const control =
-  "h-9 w-full rounded-[2px] border border-rule bg-ink-2 px-3 text-[13px] text-paper placeholder:text-paper-faint hover:border-rule-strong focus-visible:border-hazard";
+  "h-9 w-full rounded-[2px] border border-rule bg-ink-2 px-3 text-[0.8125rem] text-paper placeholder:text-paper-faint hover:border-rule-strong focus-visible:border-hazard";
 
 export function Input({ className = "", ...rest }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={`${control} ${className}`} {...rest} />;

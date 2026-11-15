@@ -11,7 +11,7 @@ import { Sidebar } from "./Sidebar";
 function SidebarFallback() {
   return (
     <>
-      <div aria-hidden="true" className="sticky top-0 hidden h-dvh w-14 shrink-0 border-r border-rule bg-rail md:block lg:w-[196px]" />
+      <div aria-hidden="true" className="sticky top-0 hidden h-dvh w-14 shrink-0 border-r border-rule bg-rail md:block lg:w-[12.25rem]" />
       <div aria-hidden="true" className="sticky top-0 z-40 h-12 border-b border-rule bg-rail md:hidden" />
     </>
   );
@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Sidebar />
       </Suspense>
       <main id="main" className="min-w-0 flex-1">
-        <div className="mx-auto w-full max-w-[1320px] px-4 py-5 sm:px-6 sm:py-6">{children}</div>
+        <div className="mx-auto w-full max-w-[82.5rem] px-4 py-5 sm:px-6 sm:py-6">{children}</div>
       </main>
     </div>
   );

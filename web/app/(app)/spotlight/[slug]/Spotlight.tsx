@@ -69,8 +69,8 @@ export function Spotlight() {
         <Declassify loading={!e} lines={3} className="mt-6">
           {e ? (
             <div>
-              <Headline className="text-[48px] leading-[52px] sm:text-[56px] sm:leading-[60px]">{e.name}</Headline>
-              <p className="tl-mono mt-4 text-[13px] text-paper-dim">
+              <Headline className="text-[3rem] leading-[3.25rem] sm:text-[3.5rem] sm:leading-[3.75rem]">{e.name}</Headline>
+              <p className="tl-mono mt-4 text-[0.8125rem] text-paper-dim">
                 {fmtDate(e.starts_on)} to {fmtDate(e.ends_on)}
               </p>
               {e.summary ? <p className="mt-4 max-w-[62ch] text-base leading-7 text-paper">{e.summary}</p> : null}
@@ -80,7 +80,7 @@ export function Spotlight() {
           )}
         </Declassify>
         {data ? (
-          <dl className="mt-8 grid max-w-[560px] grid-cols-3 border-y border-rule">
+          <dl className="mt-8 grid max-w-[35rem] grid-cols-3 border-y border-rule">
             <Stat label="CVEs" value={entries.length} />
             <Stat label="Known exploited" value={kev} hazard />
             <Stat label="Critical" value={critical} />
@@ -92,7 +92,7 @@ export function Spotlight() {
 
       {data ? (
         <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-rule py-6">
-          <p className="text-[13px] text-paper-dim">Every CVE CISA lists as exploited, not just this month.</p>
+          <p className="text-[0.8125rem] text-paper-dim">Every CVE CISA lists as exploited, not just this month.</p>
           <Button size="sm" href="/search?kev=true&sort=newest">
             Search known exploited CVEs
           </Button>
@@ -160,7 +160,7 @@ function Timeline({ entries }: { entries: EventCveRow[] }) {
       <div className="md:col-span-3">
         <div data-aside>
           <p className="tl-label">Timeline</p>
-          <p className="tl-mono mt-2 text-[32px] leading-none text-paper" aria-hidden="true">
+          <p className="tl-mono mt-2 text-[2rem] leading-none text-paper" aria-hidden="true">
             {pad(active + 1)} <span className="text-paper-faint">/ {pad(entries.length)}</span>
           </p>
           <p className="mt-3 max-w-[28ch] text-xs text-paper-dim">In order of publication. Open any CVE to see what an attacker could do with it.</p>
@@ -174,14 +174,14 @@ function Timeline({ entries }: { entries: EventCveRow[] }) {
         <ol>
           {entries.map((c) => (
             <li key={c.cve_id} data-entry className="border-b border-rule pl-6 last:border-b-0 sm:pl-8">
-              <RevealOnScroll className="grid grid-cols-1 gap-x-6 gap-y-2 py-6 sm:grid-cols-[120px_1fr]">
+              <RevealOnScroll className="grid grid-cols-1 gap-x-6 gap-y-2 py-6 sm:grid-cols-[7.5rem_1fr]">
                 <p className="tl-mono pt-0.5 text-xs text-paper-dim">
-                  <span className="tl-label block text-[10px] text-paper-faint">Published</span>
+                  <span className="tl-label block text-[0.625rem] text-paper-faint">Published</span>
                   {c.in_nvd ? fmtDate(c.published_date) : <span className="text-paper-faint">Not yet</span>}
                 </p>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-                    <IdText id={c.cve_id} href={c.in_nvd ? `/cve/${c.cve_id}` : undefined} className="text-[15px] text-paper" />
+                    <IdText id={c.cve_id} href={c.in_nvd ? `/cve/${c.cve_id}` : undefined} className="text-[0.9375rem] text-paper" />
                     {c.in_nvd ? (
                       <>
                         <SeverityTag severity={c.cvss_severity} score={c.cvss_base_score} />
@@ -194,9 +194,9 @@ function Timeline({ entries }: { entries: EventCveRow[] }) {
                       </span>
                     )}
                   </div>
-                  {c.note ? <p className="mt-2 max-w-[68ch] text-[14px] leading-6 text-paper">{c.note}</p> : null}
+                  {c.note ? <p className="mt-2 max-w-[68ch] text-[0.875rem] leading-6 text-paper">{c.note}</p> : null}
                   {c.in_nvd && c.cwes.length ? (
-                    <p className="tl-mono mt-1 text-[11px] text-paper-faint">{c.cwes.join("  ")}</p>
+                    <p className="tl-mono mt-1 text-[0.6875rem] text-paper-faint">{c.cwes.join("  ")}</p>
                   ) : null}
                   {c.in_nvd ? (
                     <Button size="sm" href={`/explore/${c.cve_id}`} className="mt-3">

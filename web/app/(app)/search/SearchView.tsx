@@ -144,11 +144,11 @@ export function SearchView() {
           onChange={(e) => setText(e.target.value)}
           placeholder="php remote code execution, or CVE-2024-3400"
           aria-label="Search CVEs"
-          className="h-full min-w-0 flex-1 bg-transparent text-[15px] text-paper outline-none placeholder:text-paper-faint focus-visible:outline-none!"
+          className="h-full min-w-0 flex-1 bg-transparent text-[0.9375rem] text-paper outline-none placeholder:text-paper-faint focus-visible:outline-none!"
           autoComplete="off"
           spellCheck={false}
         />
-        <kbd className="tl-mono hidden border border-rule px-1.5 text-[11px] text-paper-faint sm:inline">/</kbd>
+        <kbd className="tl-mono hidden border border-rule px-1.5 text-[0.6875rem] text-paper-faint sm:inline">/</kbd>
       </div>
       {unsearchable ? (
         <p className="mt-2 text-xs text-paper-dim" role="status">
@@ -183,17 +183,17 @@ export function SearchView() {
         <div className="flex items-end gap-2">
           <label className="flex flex-col gap-1.5">
             <span className="tl-label">Published from</span>
-            <Input type="date" value={get("from")} onChange={(e) => update({ from: e.target.value })} className="w-[150px] tl-mono" />
+            <Input type="date" value={get("from")} onChange={(e) => update({ from: e.target.value })} className="w-[9.375rem] tl-mono" />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="tl-label">to</span>
-            <Input type="date" value={get("to")} onChange={(e) => update({ to: e.target.value })} className="w-[150px] tl-mono" />
+            <Input type="date" value={get("to")} onChange={(e) => update({ to: e.target.value })} className="w-[9.375rem] tl-mono" />
           </label>
         </div>
 
         <CweFilter value={get("cwe")} onChange={(v) => update({ cwe: v })} />
 
-        <label className="flex h-9 cursor-pointer items-center gap-2 text-[13px] text-paper-dim hover:text-paper">
+        <label className="flex h-9 cursor-pointer items-center gap-2 text-[0.8125rem] text-paper-dim hover:text-paper">
           <input
             type="checkbox"
             checked={get("kev") === "true"}
@@ -205,7 +205,7 @@ export function SearchView() {
 
         <label className="ml-auto flex flex-col gap-1.5">
           <span className="tl-label">Sort</span>
-          <Select value={sort} onChange={(e) => update({ sort: e.target.value })} className="w-[150px]">
+          <Select value={sort} onChange={(e) => update({ sort: e.target.value })} className="w-[9.375rem]">
             {SORTS.filter((o) => o.value !== "" || (q && !unsearchable)).map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
@@ -249,19 +249,19 @@ export function SearchView() {
               />
             }
             columns={[
-              { key: "id", header: "CVE", width: "140px", render: (r) => <IdText id={r.cve_id} className="text-paper" /> },
-              { key: "sev", header: "Severity", width: "92px", render: (r) => <SeverityTag severity={r.cvss_severity} score={r.cvss_base_score} /> },
+              { key: "id", header: "CVE", width: "8.75rem", render: (r) => <IdText id={r.cve_id} className="text-paper" /> },
+              { key: "sev", header: "Severity", width: "5.75rem", render: (r) => <SeverityTag severity={r.cvss_severity} score={r.cvss_base_score} /> },
               {
                 key: "date",
                 header: "Published",
-                width: "104px",
+                width: "6.5rem",
                 render: (r) => <span className="tl-mono text-xs text-paper-dim">{fmtDate(r.published_date)}</span>,
               },
-              { key: "kev", header: "KEV", width: "48px", render: (r) => (r.is_kev ? <KevTag compact /> : null) },
+              { key: "kev", header: "KEV", width: "3rem", render: (r) => (r.is_kev ? <KevTag compact /> : null) },
               {
                 key: "cwe",
                 header: "CWE",
-                width: "96px",
+                width: "6rem",
                 render: (r) => (
                   <span className="tl-mono text-xs text-paper-dim" title={r.cwes.join(", ")}>
                     {r.cwes[0] ?? <span className="text-paper-faint">none</span>}
@@ -272,7 +272,7 @@ export function SearchView() {
               {
                 key: "desc",
                 header: "Description",
-                width: "minmax(160px,1fr)",
+                width: "minmax(10rem,1fr)",
                 render: (r) => (
                   <span className="block truncate text-paper-dim" title={r.description}>
                     {r.description}
@@ -325,10 +325,10 @@ function CweFilter({ value, onChange }: { value: string; onChange: (v: string) =
         placeholder="CWE-79"
         aria-invalid={!valid}
         aria-describedby={valid ? undefined : "cwe-hint"}
-        className="tl-mono w-[120px]"
+        className="tl-mono w-[7.5rem]"
       />
       {!valid ? (
-        <span id="cwe-hint" className="text-[11px] text-hazard">
+        <span id="cwe-hint" className="text-[0.6875rem] text-hazard">
           Use CWE-number
         </span>
       ) : null}

@@ -53,10 +53,10 @@ export function PageHeader({
     <header className="mb-6 border-b border-rule pb-4">
       <p className="tl-label">THREATLATTICE / {crumb}</p>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
-        <Headline className="text-[34px] leading-[1.05] sm:text-[40px]">{title}</Headline>
+        <Headline className="text-[2.125rem] leading-[1.05] sm:text-[2.5rem]">{title}</Headline>
         {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
       </div>
-      {subtitle ? <p className="mt-2 max-w-[70ch] text-[13px] text-paper-dim">{subtitle}</p> : null}
+      {subtitle ? <p className="mt-2 max-w-[70ch] text-[0.8125rem] text-paper-dim">{subtitle}</p> : null}
     </header>
   );
 }
