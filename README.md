@@ -63,6 +63,13 @@ npm install
 npm run dev                     # http://localhost:3000
 ```
 
+**Automatic refresh.** `docker compose up -d` also starts the `refresher` container. Every `TL_REFRESH_DAYS` (default 3.5) it re-downloads NVD, CISA KEV, CWE, CAPEC and ATT&CK and reloads MySQL and Neo4j (all loaders are idempotent; users, investigations and the audit log are untouched). On a fresh, empty database it does the first full load by itself, so the step 3 loaders are only needed if you want to watch them. The sidebar's "data as of" line shows how current the data is.
+
+```bash
+docker compose logs -f refresher                                  # watch a run
+docker compose run --rm refresher python -m etl.refresh --once    # refresh right now
+```
+
 Reset the databases completely: `docker compose down -v && docker compose up -d`.
 
 Check both databases from the app: `http://localhost:3000/api/health`.
