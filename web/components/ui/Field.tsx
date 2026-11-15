@@ -1,18 +1,13 @@
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
+
+/** The dropdown lives in Select.tsx (client component, Radix); re-exported here so existing imports keep working. */
+export { Select } from "./Select";
 
 const control =
   "h-9 w-full rounded-[2px] border border-rule bg-ink-2 px-3 text-[0.8125rem] text-paper placeholder:text-paper-faint hover:border-rule-strong focus-visible:border-hazard";
 
 export function Input({ className = "", ...rest }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={`${control} ${className}`} {...rest} />;
-}
-
-export function Select({ className = "", children, ...rest }: SelectHTMLAttributes<HTMLSelectElement> & { children: ReactNode }) {
-  return (
-    <select className={`${control} pr-8 ${className}`} {...rest}>
-      {children}
-    </select>
-  );
 }
 
 /** Label + control + optional error, stacked. */
