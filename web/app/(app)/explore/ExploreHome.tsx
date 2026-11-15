@@ -111,7 +111,7 @@ export function ExploreHome() {
             <Button type="submit" disabled={busy}>{busy ? "Searching" : "Find path"}</Button>
           </form>
           <p className="mt-2 text-[0.75rem] text-paper-faint">
-            Any CVE, CWE, CAPEC or technique ID. Neo4j shortest path, up to 8 hops, in either direction, so read it as a connection, not an attack order.
+            Any CVE, CWE, CAPEC or technique ID. Neo4j shortest path over the catalogue links (a CVE only at either end), up to 8 hops, in either direction: read it as a connection, not an attack order.
           </p>
           <div className="mt-5" aria-live="polite">
             {pathErr ? <ErrorState message={pathErr} /> : null}
