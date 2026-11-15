@@ -70,6 +70,8 @@ docker compose logs -f refresher                                  # watch a run
 docker compose run --rm refresher python -m etl.refresh --once    # refresh right now
 ```
 
+To freeze the data (for example while taking report screenshots), set `TL_REFRESH_DAYS=0` in `.env` and run `docker compose up -d refresher`. Only one refresh runs at a time (lock file), and after a failure it retries with back-off (1 h, 2 h, 4 h ... 24 h).
+
 Reset the databases completely: `docker compose down -v && docker compose up -d`.
 
 Check both databases from the app: `http://localhost:3000/api/health`.
