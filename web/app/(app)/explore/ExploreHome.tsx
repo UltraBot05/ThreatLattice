@@ -87,7 +87,7 @@ export function ExploreHome() {
                     <button
                       type="button"
                       onClick={() => router.push(`/explore/${c.cve_id}`)}
-                      className="grid w-full grid-cols-[150px_100px_minmax(0,1fr)] items-center gap-3 border-b border-rule px-1 py-2 text-left text-[13px] hover:bg-ink-3"
+                      className="grid w-full grid-cols-[9.375rem_6.25rem_minmax(0,1fr)] items-center gap-3 border-b border-rule px-1 py-2 text-left text-[0.8125rem] hover:bg-ink-3"
                     >
                       <IdText id={c.cve_id} />
                       <SeverityTag severity={c.cvss_severity} score={c.cvss_base_score} />
@@ -110,7 +110,7 @@ export function ExploreHome() {
             </Field>
             <Button type="submit" disabled={busy}>{busy ? "Searching" : "Find path"}</Button>
           </form>
-          <p className="mt-2 text-[12px] text-paper-faint">
+          <p className="mt-2 text-[0.75rem] text-paper-faint">
             Any CVE, CWE, CAPEC or technique ID. Neo4j shortest path, up to 8 hops, in either direction, so read it as a connection, not an attack order.
           </p>
           <div className="mt-5" aria-live="polite">
@@ -118,16 +118,16 @@ export function ExploreHome() {
             {path ? (
               <ol className="flex flex-col">
                 {path.nodes.map((n, i) => (
-                  <li key={n.id} className="grid grid-cols-[28px_120px_minmax(0,1fr)] items-baseline gap-2 border-b border-rule py-2 text-[13px]">
-                    <span className="tl-mono text-[11px] text-paper-faint">{String(i).padStart(2, "0")}</span>
+                  <li key={n.id} className="grid grid-cols-[1.75rem_7.5rem_minmax(0,1fr)] items-baseline gap-2 border-b border-rule py-2 text-[0.8125rem]">
+                    <span className="tl-mono text-[0.6875rem] text-paper-faint">{String(i).padStart(2, "0")}</span>
                     <span className="tl-mono text-paper">{n.id}</span>
                     <span className="truncate text-paper-dim" title={n.label}>
                       {n.label}
-                      {i < path.edges.length ? <span className="tl-mono ml-2 text-[10px] text-paper-faint">{path.edges[i].type}</span> : null}
+                      {i < path.edges.length ? <span className="tl-mono ml-2 text-[0.625rem] text-paper-faint">{path.edges[i].type}</span> : null}
                     </span>
                   </li>
                 ))}
-                <li className="tl-mono pt-2 text-[11px] text-paper-faint">{path.hops} HOPS</li>
+                <li className="tl-mono pt-2 text-[0.6875rem] text-paper-faint">{path.hops} HOPS</li>
               </ol>
             ) : null}
           </div>

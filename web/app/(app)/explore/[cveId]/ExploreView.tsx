@@ -72,14 +72,14 @@ export function ExploreView() {
     <header className="mb-6 border-b border-rule pb-4">
       <p className="tl-label">THREATLATTICE / EXPLORE</p>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
-        <h1 className="tl-mono text-[28px] leading-tight text-paper sm:text-[32px]">
+        <h1 className="tl-mono text-[1.75rem] leading-tight text-paper sm:text-[2rem]">
           <DecodeText text={id} />
         </h1>
         <div className="flex gap-2">
           <Button size="sm" href={`/cve/${id}`}>CVE dossier</Button>
         </div>
       </div>
-      <p className="mt-2 max-w-[75ch] text-[13px] text-paper-dim">
+      <p className="mt-2 max-w-[75ch] text-[0.8125rem] text-paper-dim">
         What an attacker could do with this vulnerability: its weaknesses, the attack patterns that exploit them, and the ATT&amp;CK techniques those patterns enable.
       </p>
     </header>
@@ -100,11 +100,11 @@ export function ExploreView() {
 
   const selectedNode = selected ? byId.get(selected) ?? null : null;
   const columns: Column<TechRow>[] = [
-    { key: "id", header: "Technique", width: "110px", render: (r) => <IdText id={r.id} /> },
+    { key: "id", header: "Technique", width: "6.875rem", render: (r) => <IdText id={r.id} /> },
     { key: "name", header: "Name", render: (r) => <span className="block truncate" title={r.name}>{r.name}</span> },
-    { key: "tactics", header: "Tactics", width: "minmax(0,0.8fr)", render: (r) => <span className="tl-mono block truncate text-[12px] text-paper-dim">{r.tactics.join(", ")}</span> },
-    { key: "via", header: "Shortest route", width: "minmax(0,1.2fr)", render: (r) => <span className="tl-mono block truncate text-[12px] text-paper-dim" title={r.via}>{r.via}</span> },
-    { key: "chains", header: "Chains", width: "64px", align: "right", render: (r) => <span className="tl-mono">{r.chains}</span> },
+    { key: "tactics", header: "Tactics", width: "minmax(0,0.8fr)", render: (r) => <span className="tl-mono block truncate text-[0.75rem] text-paper-dim">{r.tactics.join(", ")}</span> },
+    { key: "via", header: "Shortest route", width: "minmax(0,1.2fr)", render: (r) => <span className="tl-mono block truncate text-[0.75rem] text-paper-dim" title={r.via}>{r.via}</span> },
+    { key: "chains", header: "Chains", width: "4rem", align: "right", render: (r) => <span className="tl-mono">{r.chains}</span> },
   ];
 
   return (
@@ -121,7 +121,7 @@ export function ExploreView() {
           ))}
         </div>
         {chain ? (
-          <p className="tl-mono text-[12px] text-paper-dim" aria-live="polite">
+          <p className="tl-mono text-[0.75rem] text-paper-dim" aria-live="polite">
             {chain.meta.counts.cwe} CWE · {chain.meta.counts.capec} CAPEC · {chain.meta.counts.technique} TECHNIQUES · {chain.paths.length} CHAINS
             {chain.meta.truncated ? " (first 400 shown)" : ""}
           </p>
@@ -151,7 +151,7 @@ export function ExploreView() {
             </aside>
           </div>
         ) : (
-          <div className="h-[560px]" />
+          <div className="h-[38rem]" />
         )}
       </Declassify>
 
@@ -159,7 +159,7 @@ export function ExploreView() {
         <Panel index={1} label="Tactics reached" className="mt-8">
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
             {chain.meta.tactics.map((t) => (
-              <li key={t.tactic} className="tl-mono text-[12px]">
+              <li key={t.tactic} className="tl-mono text-[0.75rem]">
                 <span className="text-paper">{t.tactic}</span> <span className="text-paper-faint">{t.techniques}</span>
               </li>
             ))}
