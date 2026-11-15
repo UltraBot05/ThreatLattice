@@ -86,9 +86,9 @@ F02 and F03 pass a valid `cvss_source`, so the only rule they break is the score
 | P05 | `sp_create_investigation` valid call: returns id, writes one audit row (trigger, same transaction) | id not NULL, 1 audit row | id=2, 1 audit row | PASS |
 | P06 | The four failed procedure calls (F25–F28) rolled back completely | 1 investigation for the test users | 1 | PASS |
 | P07 | Event CVE not yet in NVD (no FK on purpose) and a one-day event | 1 event_cve, 1 one-day event | 1, 1 | PASS |
-| P08 | `trg_inv_au` logs only real changes: an UPDATE with identical values adds no audit row, a notes change adds one | no-op=0, real=1 | [[run]] | [[run]] |
+| P08 | `trg_inv_au` logs only real changes: an UPDATE with identical values adds no audit row, a notes change adds one | no-op=0, real=1 | no-op=0, real=1 | PASS |
 
-**8 / 8 passed** (P08 added after the run above; fill in its result after re-running the file).
+**8 / 8 passed.** (P08 added and run on 2026-11-16 against the loaded database, together with a full re-run: all F-tests rejected as before, P01-P08 PASS.)
 
 ## Observations
 
