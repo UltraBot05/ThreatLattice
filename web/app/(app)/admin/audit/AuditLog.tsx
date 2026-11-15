@@ -131,6 +131,7 @@ export function AuditLog() {
                 key: "user",
                 header: "User",
                 width: "8.125rem",
+                hideBelow: 40,
                 render: (r) =>
                   r.username ? (
                     <span className="block truncate text-[0.8125rem]">{r.username}</span>
@@ -142,6 +143,7 @@ export function AuditLog() {
                 key: "entity",
                 header: "Record",
                 width: "10.625rem",
+                hideBelow: 52,
                 render: (r) => (
                   <span className="tl-mono text-xs">
                     {r.entity}
