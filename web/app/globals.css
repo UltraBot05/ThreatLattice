@@ -106,3 +106,15 @@ body {
   .tl-pulse { animation: none; }
   .tl-headline-pending { visibility: visible; }
 }
+
+/* React Flow (chain explorer) on the Declassified tokens. */
+.tl-flow .react-flow__attribution { display: none; }
+.tl-flow .react-flow__edge-path { stroke: var(--color-rule-strong); stroke-width: 1.25; }
+.tl-flow .react-flow__edge.tl-hot .react-flow__edge-path { stroke: var(--color-hazard); stroke-width: 1.75; }
+.tl-flow .react-flow__edge.tl-dim { opacity: 0.25; }
+.tl-flow .react-flow__edge-textbg { fill: var(--color-ink); }
+.tl-flow .react-flow__edge-text { fill: var(--color-paper-faint); font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em; }
+.tl-flow .react-flow__controls { box-shadow: none; border: 1px solid var(--color-rule); }
+.tl-flow .react-flow__controls-button { background: var(--color-ink-2); border-bottom: 1px solid var(--color-rule); fill: var(--color-paper-dim); }
+.tl-flow .react-flow__controls-button:hover { background: var(--color-ink-3); }
+.tl-flow .react-flow__handle { opacity: 0; pointer-events: none; }
