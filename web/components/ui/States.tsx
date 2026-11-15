@@ -14,7 +14,7 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-start gap-2 border border-dashed border-rule px-4 py-6">
       <p className="tl-label">{label}</p>
-      <p className="text-[13px] text-paper-dim">{message}</p>
+      <p className="text-[0.8125rem] text-paper-dim">{message}</p>
       {action}
     </div>
   );
@@ -25,7 +25,7 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
   return (
     <div role="alert" className="flex flex-col items-start gap-2 border-l-2 border-hazard bg-hazard-dim px-4 py-3">
       <p className="tl-label text-hazard">COULD NOT LOAD</p>
-      <p className="text-[13px] text-paper">{message}</p>
+      <p className="text-[0.8125rem] text-paper">{message}</p>
       {onRetry ? (
         <Button size="sm" onClick={onRetry}>
           Retry

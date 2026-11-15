@@ -47,11 +47,11 @@ const ROWS: Row[] = [
 ];
 
 const columns: Column<Row>[] = [
-  { key: "id", header: "CVE", width: "150px", render: (r) => <IdText id={r.id} /> },
+  { key: "id", header: "CVE", width: "9.375rem", render: (r) => <IdText id={r.id} /> },
   { key: "note", header: "Summary", render: (r) => <span className="block truncate">{r.note}</span> },
-  { key: "sev", header: "Severity", width: "110px", render: (r) => <SeverityTag severity={r.severity} score={r.score} /> },
-  { key: "src", header: "Source", width: "96px", render: (r) => <SourceTag source={r.source} /> },
-  { key: "kev", header: "KEV", width: "70px", align: "right", render: (r) => (r.kev ? <KevTag compact /> : <span className="text-paper-faint">-</span>) },
+  { key: "sev", header: "Severity", width: "6.875rem", render: (r) => <SeverityTag severity={r.severity} score={r.score} /> },
+  { key: "src", header: "Source", width: "6rem", render: (r) => <SourceTag source={r.source} /> },
+  { key: "kev", header: "KEV", width: "4.375rem", align: "right", render: (r) => (r.kev ? <KevTag compact /> : <span className="text-paper-faint">-</span>) },
 ];
 
 export function StyleguideDemo() {
@@ -130,7 +130,7 @@ export function StyleguideDemo() {
             <p className="text-2xl">
               <DecodeText text="CVE-2026-109618" />
             </p>
-            <p className="mt-1 text-[13px] text-paper-dim">
+            <p className="mt-1 text-[0.8125rem] text-paper-dim">
               Decodes once on first render. Screen readers get the real text.
             </p>
           </Panel>

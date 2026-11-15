@@ -114,7 +114,7 @@ export function AuditLog() {
               {
                 key: "ts",
                 header: "When",
-                width: "150px",
+                width: "9.375rem",
                 render: (r) => (
                   <time dateTime={r.ts} title={fmtExact(r.ts)} className="tl-mono text-xs text-paper-dim">
                     {fmtRelative(r.ts, now)}
@@ -124,16 +124,16 @@ export function AuditLog() {
               {
                 key: "action",
                 header: "Action",
-                width: "112px",
+                width: "7rem",
                 render: (r) => <span className={`tl-mono text-xs ${r.action === "LOGIN_FAIL" ? "text-hazard" : "text-paper"}`}>{r.action}</span>,
               },
               {
                 key: "user",
                 header: "User",
-                width: "130px",
+                width: "8.125rem",
                 render: (r) =>
                   r.username ? (
-                    <span className="block truncate text-[13px]">{r.username}</span>
+                    <span className="block truncate text-[0.8125rem]">{r.username}</span>
                   ) : (
                     <span className="text-xs text-paper-faint">{r.action === "LOGIN_FAIL" ? "unknown user" : "none"}</span>
                   ),
@@ -141,7 +141,7 @@ export function AuditLog() {
               {
                 key: "entity",
                 header: "Record",
-                width: "170px",
+                width: "10.625rem",
                 render: (r) => (
                   <span className="tl-mono text-xs">
                     {r.entity}
@@ -149,7 +149,7 @@ export function AuditLog() {
                   </span>
                 ),
               },
-              { key: "details", header: "Details", width: "minmax(220px,1fr)", render: (r) => <Details d={r.details} /> },
+              { key: "details", header: "Details", width: "minmax(13.75rem,1fr)", render: (r) => <Details d={r.details} /> },
             ]}
           />
         </div>

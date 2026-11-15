@@ -42,10 +42,10 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[360px]">
+    <div className="mx-auto w-full max-w-[22.5rem]">
       <p className="tl-label">THREATLATTICE / {isLogin ? "SIGN IN" : "REGISTER"}</p>
-      <Headline className="mt-2 text-[40px] leading-[1.05]">{isLogin ? "Sign in" : "Create an account"}</Headline>
-      <p className="mt-2 text-[13px] text-paper-dim">
+      <Headline className="mt-2 text-[2.5rem] leading-[1.05]">{isLogin ? "Sign in" : "Create an account"}</Headline>
+      <p className="mt-2 text-[0.8125rem] text-paper-dim">
         {isLogin ? "Use your username or email." : "New accounts are analysts. An admin can change roles."}
       </p>
 
@@ -75,7 +75,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         </Field>
 
         {formError ? (
-          <p role="alert" className="border-l-2 border-hazard bg-hazard-dim px-3 py-2 text-[13px]">
+          <p role="alert" className="border-l-2 border-hazard bg-hazard-dim px-3 py-2 text-[0.8125rem]">
             {formError}
           </p>
         ) : null}
@@ -85,7 +85,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         </Button>
       </form>
 
-      <p className="mt-6 text-[13px] text-paper-dim">
+      <p className="mt-6 text-[0.8125rem] text-paper-dim">
         {isLogin ? "No account yet? " : "Already registered? "}
         <Link
           href={isLogin ? "/register" : "/login"}

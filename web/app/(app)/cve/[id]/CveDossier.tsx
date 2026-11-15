@@ -58,7 +58,7 @@ export function CveDossier() {
       <div className="grid grid-cols-1 gap-8 border-b border-rule pb-8 lg:grid-cols-12">
         {/* Cover sheet */}
         <aside className="lg:col-span-4 lg:border-r lg:border-rule lg:pr-8">
-          <h1 className="tl-mono whitespace-nowrap text-[26px] leading-tight text-paper xl:text-[30px]">
+          <h1 className="tl-mono whitespace-nowrap text-[1.625rem] leading-tight text-paper xl:text-[1.875rem]">
             <DecodeText text={id} />
           </h1>
           <Declassify loading={!c} lines={6} className="mt-4">
@@ -70,7 +70,7 @@ export function CveDossier() {
                   </span>
                   {c.is_kev ? <KevTag /> : null}
                 </div>
-                <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-[13px]">
+                <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-[0.8125rem]">
                   <Row label="Published" value={fmtDate(c.published_date)} />
                   <Row label="Modified" value={fmtDate(c.last_modified_date)} />
                   {c.is_kev ? <Row label="KEV since" value={fmtDate(c.kev_date_added)} /> : null}
@@ -103,11 +103,11 @@ export function CveDossier() {
           <Panel index={1} label="Weaknesses">
             <Declassify loading={!data} lines={2}>
               {data && data.cwes.length === 0 ? (
-                <p className="text-[13px] text-paper-dim">NVD has not linked a weakness (CWE) to this CVE yet.</p>
+                <p className="text-[0.8125rem] text-paper-dim">NVD has not linked a weakness (CWE) to this CVE yet.</p>
               ) : (
                 <ul className="flex flex-col">
                   {(data?.cwes ?? []).map((w) => (
-                    <li key={w.id} className="grid grid-cols-[96px_1fr] items-baseline gap-3 border-b border-rule py-2 text-[13px] last:border-b-0">
+                    <li key={w.id} className="grid grid-cols-[6rem_1fr] items-baseline gap-3 border-b border-rule py-2 text-[0.8125rem] last:border-b-0">
                       <IdText id={w.id} href={`/search?cwe=${w.id}`} />
                       <span className="min-w-0">
                         <span className="text-paper">{w.common_name ?? w.name}</span>
@@ -125,7 +125,7 @@ export function CveDossier() {
             label="Affected products"
             actions={
               data && data.productsTotal > data.products.length ? (
-                <span className="tl-mono text-[11px] text-paper-faint">
+                <span className="tl-mono text-[0.6875rem] text-paper-faint">
                   Showing {fmtInt(data.products.length)} of {fmtInt(data.productsTotal)}
                 </span>
               ) : null
@@ -143,7 +143,7 @@ export function CveDossier() {
                 {
                   key: "ver",
                   header: "Version",
-                  width: "120px",
+                  width: "7.5rem",
                   render: (p) => (
                     <span
                       className="tl-mono text-xs text-paper-dim"
@@ -161,7 +161,7 @@ export function CveDossier() {
             <Panel index={3} label="In the news">
               <ul className="flex flex-col">
                 {data.events.map((e) => (
-                  <li key={e.slug} className="border-b border-rule py-2 text-[13px] last:border-b-0">
+                  <li key={e.slug} className="border-b border-rule py-2 text-[0.8125rem] last:border-b-0">
                     <Link href={`/spotlight/${e.slug}`} className="text-paper underline-offset-4 hover:text-hazard hover:underline">
                       {e.name}
                     </Link>
@@ -185,7 +185,7 @@ function Row({ label, value, hazard = false }: { label: string; value: ReactNode
   return (
     <>
       <dt className="tl-label pt-0.5">{label}</dt>
-      <dd className={`tl-mono text-[13px] ${hazard ? "text-hazard" : "text-paper"}`}>{value}</dd>
+      <dd className={`tl-mono text-[0.8125rem] ${hazard ? "text-hazard" : "text-paper"}`}>{value}</dd>
     </>
   );
 }

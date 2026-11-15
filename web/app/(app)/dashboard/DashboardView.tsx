@@ -44,7 +44,7 @@ export function DashboardView() {
         actions={
           <label className="flex items-center gap-2">
             <span className="tl-label">Year</span>
-            <Select value={year} onChange={(e) => setYear(e.target.value)} className="w-[130px]" aria-label="Year">
+            <Select value={year} onChange={(e) => setYear(e.target.value)} className="w-[8.125rem]" aria-label="Year">
               <option value="">All years</option>
               {(s?.byYear ?? [])
                 .slice()
@@ -105,7 +105,7 @@ export function DashboardView() {
               rowHref={(c) => `/search?cwe=${c.cwe_id}${year ? `&from=${year}-01-01&to=${year}-12-31` : ""}`}
               flipKey={year}
               columns={[
-                { key: "id", header: "CWE", width: "96px", render: (c) => <IdText id={c.cwe_id} /> },
+                { key: "id", header: "CWE", width: "6rem", render: (c) => <IdText id={c.cwe_id} /> },
                 {
                   key: "name",
                   header: "Weakness",
@@ -115,18 +115,18 @@ export function DashboardView() {
                     </span>
                   ),
                 },
-                { key: "n", header: "CVEs", width: "80px", align: "right", render: (c) => <span className="tl-mono">{fmtInt(c.count)}</span> },
+                { key: "n", header: "CVEs", width: "5rem", align: "right", render: (c) => <span className="tl-mono">{fmtInt(c.count)}</span> },
                 {
                   key: "avg",
                   header: "Avg score",
-                  width: "88px",
+                  width: "5.5rem",
                   align: "right",
                   render: (c) => <span className="tl-mono text-paper-dim">{c.avg_score?.toFixed(1) ?? "n/a"}</span>,
                 },
                 {
                   key: "kev",
                   header: "KEV",
-                  width: "56px",
+                  width: "3.5rem",
                   align: "right",
                   render: (c) => <span className={`tl-mono ${c.kev_count ? "text-paper" : "text-paper-faint"}`}>{fmtInt(c.kev_count)}</span>,
                 },

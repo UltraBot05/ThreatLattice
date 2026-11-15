@@ -21,7 +21,7 @@ export function SeverityTag({ severity, score }: { severity: Severity | null; sc
       className="tl-mono inline-flex items-center gap-1.5 text-xs text-paper"
       title={`${severity ?? "Unscored"}${scoreText ? ` ${scoreText}` : ""}`}
     >
-      <span aria-hidden="true" className={`h-3.5 w-[3px] ${s.bar}`} />
+      <span aria-hidden="true" className={`h-3.5 w-[0.1875rem] ${s.bar}`} />
       <span>{s.short}</span>
       {scoreText ? <span className={severity === "CRITICAL" ? "text-hazard" : "text-paper-dim"}>{scoreText}</span> : null}
     </span>
@@ -31,7 +31,7 @@ export function SeverityTag({ severity, score }: { severity: Severity | null; sc
 export function KevTag({ compact = false }: { compact?: boolean }) {
   return (
     <span
-      className="tl-mono inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.06em] text-hazard"
+      className="tl-mono inline-flex items-center gap-1.5 text-[0.6875rem] uppercase tracking-[0.06em] text-hazard"
       title="Listed in CISA's Known Exploited Vulnerabilities catalogue"
     >
       <span aria-hidden="true" className="tl-pulse h-1.5 w-1.5 rounded-full bg-hazard" />
@@ -50,7 +50,7 @@ export function SourceTag({ source }: { source: CvssSource | null }) {
   if (!source) return null;
   const s = SOURCE[source];
   return (
-    <span className="tl-mono text-[11px] text-paper-faint" title={s.title}>
+    <span className="tl-mono text-[0.6875rem] text-paper-faint" title={s.title}>
       {s.label}
     </span>
   );
