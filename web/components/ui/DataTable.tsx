@@ -1,16 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { KeyboardEvent, ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Declassify } from "@/components/motion/Declassify";
 import { FlipList } from "@/components/motion/FlipList";
 import { EmptyState } from "./States";
+import { useRemPx } from "./useRemPx";
 
 /**
  * Dense data table built from div rows with ARIA table roles, so rows can
  * animate with Flip. Keyboard: Tab into the table, Up/Down move between rows,
  * Enter opens the row (rowHref or onRowClick).
  * Pass flipKey (e.g. `${sort}-${filters}`) to animate reorders with Flip.
+ * Columns with hideBelow drop out when the table is narrower than that many
+ * rem, so the flexible column (usually Description) keeps its room at large
+ * text sizes instead of being pushed out of view.
  */
 export interface Column<T> {
   key: string;
@@ -18,11 +22,13 @@ export interface Column<T> {
   /** CSS grid track, e.g. "160px" or "minmax(0,1fr)". */
   width?: string;
   align?: "left" | "right";
+  /** Hide this column when the table is narrower than this many rem. */
+  hideBelow?: number;
   render: (row: T) => ReactNode;
 }
 
 export function DataTable<T>({
-  columns,
+  columns: allColumns,
   rows,
   rowId,
   rowHref,
@@ -43,6 +49,18 @@ export function DataTable<T>({
   caption?: string;
 }) {
   const router = useRouter();
+  const wrap = useRef<HTMLDivElement>(null);
+  const rem = useRemPx();
+  const [widthPx, setWidthPx] = useState<number | null>(null);
+  useEffect(() => {
+    const el = wrap.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setWidthPx(el.clientWidth));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const widthRem = widthPx === null ? Infinity : widthPx / rem;
+  const columns = allColumns.filter((c) => c.hideBelow === undefined || widthRem >= c.hideBelow);
   const template = columns.map((c) => c.width ?? "minmax(0,1fr)").join(" ");
   const interactive = Boolean(rowHref || onRowClick);
 
@@ -81,7 +99,7 @@ export function DataTable<T>({
   ));
 
   return (
-    <div role="table" aria-label={caption} aria-busy={loading} className="w-full overflow-x-auto">
+    <div ref={wrap} role="table" aria-label={caption} aria-busy={loading} className="w-full overflow-x-auto">
       <div role="rowgroup">
         <div
           role="row"
