@@ -18,11 +18,11 @@ const TYPE_NAME = { CVE: "Vulnerability", CWE: "Weakness", CAPEC: "Attack patter
 export function NodePanel({ chain, node }: { chain: ChainGraph; node: GraphNode | null }) {
   if (!node) {
     return (
-      <div className="text-[13px] leading-6 text-paper-dim">
+      <div className="text-[0.8125rem] leading-6 text-paper-dim">
         <p className="tl-label mb-2">HOW TO READ IT</p>
         <p>Left to right: the vulnerability, the weakness it is an instance of, broader parent weaknesses, the attack patterns that exploit them, and the ATT&amp;CK techniques those patterns enable.</p>
         <p className="mt-3">Select any node to highlight every chain through it. Drag to pan, scroll to zoom.</p>
-        <ul className="mt-4 flex flex-col gap-1.5 text-[12px]">
+        <ul className="mt-4 flex flex-col gap-1.5 text-[0.75rem]">
           <li>&#9633; CVE &nbsp; &#9671; CWE &nbsp; &#11041; CAPEC &nbsp; &#9675; Technique</li>
         </ul>
       </div>
@@ -32,13 +32,13 @@ export function NodePanel({ chain, node }: { chain: ChainGraph; node: GraphNode 
   const url = externalUrl(node);
   const p = node.props;
   return (
-    <div className="flex flex-col gap-4 text-[13px]">
+    <div className="flex flex-col gap-4 text-[0.8125rem]">
       <div>
         <p className="tl-label">{TYPE_NAME[node.type]}</p>
         <p className="tl-mono mt-1 text-lg text-paper">{node.id}</p>
         {node.type !== "CVE" ? <p className="mt-1 leading-5 text-paper">{node.label}</p> : null}
         {node.type === "CWE" && p.common_name && p.name !== p.common_name ? (
-          <p className="mt-1 text-[12px] leading-5 text-paper-dim">{String(p.name)}</p>
+          <p className="mt-1 text-[0.75rem] leading-5 text-paper-dim">{String(p.name)}</p>
         ) : null}
       </div>
       <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1.5">
@@ -67,7 +67,7 @@ export function NodePanel({ chain, node }: { chain: ChainGraph; node: GraphNode 
         {node.type === "Technique" ? (
           <>
             <dt className="tl-label self-center">Tactics</dt>
-            <dd className="tl-mono text-[12px]">{((p.tactics as string[]) ?? []).join(", ") || "none"}</dd>
+            <dd className="tl-mono text-[0.75rem]">{((p.tactics as string[]) ?? []).join(", ") || "none"}</dd>
           </>
         ) : null}
         <dt className="tl-label self-center">Chains</dt>
