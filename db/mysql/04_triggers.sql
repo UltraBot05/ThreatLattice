@@ -90,20 +90,32 @@ END $$
 
 -- UPDATE: keeps before and after values of the editable fields, so the
 -- audit page can show what changed.
+-- MySQL fires AFTER UPDATE for every row the UPDATE matched, even when
+-- no value changed (a save that changes nothing, a PATCH with the same
+-- title). Such a row would log before = after, so it is skipped.
+-- The fields are compared as bytes (CAST ... AS BINARY): the column
+-- collation utf8mb4_0900_ai_ci ignores case and accents, so a plain
+-- '<=>' would call 'Report' and 'report' equal and hide a real edit.
+-- '<=>' keeps the NULL-safe rule (notes NULL -> 'x' is a change).
 DROP TRIGGER IF EXISTS trg_inv_au $$
 CREATE TRIGGER trg_inv_au
 AFTER UPDATE ON investigation
 FOR EACH ROW
 BEGIN
-    INSERT INTO audit_log (user_id, action, entity, entity_id, details)
-    VALUES (NEW.user_id, 'UPDATE', 'investigation', NEW.investigation_id,
-            JSON_OBJECT(
-                'before', JSON_OBJECT('title', OLD.title, 'notes', OLD.notes,
-                                      'start_node_type', OLD.start_node_type,
-                                      'start_node_id',   OLD.start_node_id),
-                'after',  JSON_OBJECT('title', NEW.title, 'notes', NEW.notes,
-                                      'start_node_type', NEW.start_node_type,
-                                      'start_node_id',   NEW.start_node_id)));
+    IF NOT (CAST(NEW.title           AS BINARY) <=> CAST(OLD.title           AS BINARY)
+        AND CAST(NEW.notes           AS BINARY) <=> CAST(OLD.notes           AS BINARY)
+        AND CAST(NEW.start_node_type AS BINARY) <=> CAST(OLD.start_node_type AS BINARY)
+        AND CAST(NEW.start_node_id   AS BINARY) <=> CAST(OLD.start_node_id   AS BINARY)) THEN
+        INSERT INTO audit_log (user_id, action, entity, entity_id, details)
+        VALUES (NEW.user_id, 'UPDATE', 'investigation', NEW.investigation_id,
+                JSON_OBJECT(
+                    'before', JSON_OBJECT('title', OLD.title, 'notes', OLD.notes,
+                                          'start_node_type', OLD.start_node_type,
+                                          'start_node_id',   OLD.start_node_id),
+                    'after',  JSON_OBJECT('title', NEW.title, 'notes', NEW.notes,
+                                          'start_node_type', NEW.start_node_type,
+                                          'start_node_id',   NEW.start_node_id)));
+    END IF;
 END $$
 
 -- DELETE: only OLD exists. The title is copied into details because the
@@ -157,9 +169,13 @@ DELIMITER ;
 --
 --   CALL sp_create_investigation(1, 'audit test', 'CVE', 'CVE-2026-900001', NULL, @id);
 --   UPDATE investigation SET title = 'audit test 2' WHERE investigation_id = @id;
+--   UPDATE investigation SET title = 'audit test 2' WHERE investigation_id = @id;
+--     -> no new audit row (nothing changed)
+--   UPDATE investigation SET title = 'Audit Test 2' WHERE investigation_id = @id;
+--     -> UPDATE row (case-only edit still counts)
 --   DELETE FROM investigation WHERE investigation_id = @id;
---   SELECT action, entity_id, details FROM audit_log ORDER BY log_id DESC LIMIT 3;
---     -> DELETE, UPDATE (before/after), INSERT
+--   SELECT action, entity_id, details FROM audit_log ORDER BY log_id DESC LIMIT 4;
+--     -> DELETE, UPDATE (Audit Test 2), UPDATE (audit test 2), INSERT
 --
 --   UPDATE app_user SET role = 'admin' WHERE user_id = 1;
 --   SELECT action, details FROM audit_log ORDER BY log_id DESC LIMIT 1;  -> ROLE_CHANGE
