@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="ThreatLattice">
+<rect x="0.5" y="0.5" width="119" height="119" rx="26" fill="#0b0b0c" stroke="#3a383d"/>
+<g fill="none" stroke-linecap="square"><path d="M48.0 38 H69" stroke="#ff4d2e" stroke-width="3.2"/><path d="M82 51 V69.5" stroke="#ff4d2e" stroke-width="3.2"/><path d="M71.17 82 H48.5" stroke="#ff4d2e" stroke-width="3.2"/><path d="M38 48.0 V71.5" stroke="#6c6862" stroke-width="3.2" stroke-dasharray="3.2 3.2" stroke-linecap="butt"/></g><g fill="#0b0b0c" stroke="#ece8e1" stroke-width="3.2" stroke-linejoin="miter"><rect x="28.0" y="28.0" width="20" height="20"/><path d="M82 25 L95 38 L82 51 L69 38Z"/><path d="M82.00 69.50 L92.83 75.75 L92.83 88.25 L82.00 94.50 L71.17 88.25 L71.17 75.75Z"/><circle cx="38" cy="82" r="10.5"/></g>
+</svg>
