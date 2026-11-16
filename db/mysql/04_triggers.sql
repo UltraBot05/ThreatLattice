@@ -98,10 +98,13 @@ BEGIN
     -- Only log a real change. A save with identical values (or a change to
     -- updated_at alone) would otherwise add an UPDATE row whose before and
     -- after are the same. <=> is the NULL-safe equality (notes can be NULL).
-    IF NOT (NEW.title           <=> OLD.title
-        AND NEW.notes           <=> OLD.notes
-        AND NEW.start_node_type <=> OLD.start_node_type
-        AND NEW.start_node_id   <=> OLD.start_node_id) THEN
+    -- The fields are compared as bytes (CAST ... AS BINARY): the column
+    -- collation utf8mb4_0900_ai_ci ignores case and accents, so a plain <=>
+    -- would call 'Report' and 'report' equal and hide a real edit.
+    IF NOT (CAST(NEW.title           AS BINARY) <=> CAST(OLD.title           AS BINARY)
+        AND CAST(NEW.notes           AS BINARY) <=> CAST(OLD.notes           AS BINARY)
+        AND CAST(NEW.start_node_type AS BINARY) <=> CAST(OLD.start_node_type AS BINARY)
+        AND CAST(NEW.start_node_id   AS BINARY) <=> CAST(OLD.start_node_id   AS BINARY)) THEN
         INSERT INTO audit_log (user_id, action, entity, entity_id, details)
         VALUES (NEW.user_id, 'UPDATE', 'investigation', NEW.investigation_id,
                 JSON_OBJECT(
@@ -165,9 +168,13 @@ DELIMITER ;
 --
 --   CALL sp_create_investigation(1, 'audit test', 'CVE', 'CVE-2026-900001', NULL, @id);
 --   UPDATE investigation SET title = 'audit test 2' WHERE investigation_id = @id;
+--   UPDATE investigation SET title = 'audit test 2' WHERE investigation_id = @id;
+--     -> no new audit row (nothing changed)
+--   UPDATE investigation SET title = 'Audit Test 2' WHERE investigation_id = @id;
+--     -> UPDATE row (a case-only edit still counts)
 --   DELETE FROM investigation WHERE investigation_id = @id;
---   SELECT action, entity_id, details FROM audit_log ORDER BY log_id DESC LIMIT 3;
---     -> DELETE, UPDATE (before/after), INSERT
+--   SELECT action, entity_id, details FROM audit_log ORDER BY log_id DESC LIMIT 4;
+--     -> DELETE, UPDATE (Audit Test 2), UPDATE (audit test 2), INSERT
 --
 --   UPDATE app_user SET role = 'admin' WHERE user_id = 1;
 --   SELECT action, details FROM audit_log ORDER BY log_id DESC LIMIT 1;  -> ROLE_CHANGE

@@ -125,7 +125,7 @@ CAPEC→CWE (`EXPLOITS`) and CAPEC→Technique (`ENABLES`) links exist only in N
 | ts | TIMESTAMP | | no | CURRENT_TIMESTAMP | indexes `idx_audit_ts`, `idx_audit_action_ts (action, ts)` |
 | details | JSON | | yes | | *v2*: title, before/after values |
 
-Written by triggers `trg_inv_ai/au/ad` and `trg_user_au` (04_triggers.sql) and by the auth API (LOGIN, LOGIN_FAIL).
+Written by triggers `trg_inv_ai/au/ad` and `trg_user_au` (04_triggers.sql) and by the auth API (LOGIN, LOGIN_FAIL). `trg_inv_au` skips an UPDATE that changes none of title, notes or start node (compared byte for byte, so a case-only edit still counts), and `trg_user_au` logs only real role changes.
 
 ### `security_event` *v2* — curated incidents (Black October 2026)
 | Column | Type | Key | Null | Default | Constraints / notes |
