@@ -13,6 +13,7 @@ import { useApi } from "@/lib/client/api";
 import { planSearch } from "@/lib/search";
 import type { CveRow, Paged } from "@/lib/types";
 import { fmtDate, fmtInt } from "../_shared/format";
+import { useWidthRem } from "../_shared/useRem";
 
 /**
  * /search: full-text and filter search over every CVE.
@@ -40,6 +41,16 @@ const SORTS = [
 const PAGE_SIZE = 25;
 const FILTER_KEYS = ["q", "severity", "from", "to", "kev", "cwe", "sort", "page"] as const;
 
+/** First CWE plus "+n" for the rest (all of them in the tooltip). */
+function cweCell(r: CveRow) {
+  return (
+    <span className="tl-mono text-xs text-paper-dim" title={r.cwes.join(", ")}>
+      {r.cwes[0] ?? <span className="text-paper-faint">none</span>}
+      {r.cwes.length > 1 ? <span className="text-paper-faint"> +{r.cwes.length - 1}</span> : null}
+    </span>
+  );
+}
+
 function isTyping(t: EventTarget | null) {
   const el = t as HTMLElement | null;
   return !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
@@ -50,6 +61,12 @@ export function SearchView() {
   const pathname = usePathname();
   const params = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
+  // Six fixed columns need about 44rem before Description gets any room. In a
+  // narrower box (tablet, or text size L/XL), Published moves under the CVE id
+  // and CWE under the severity, so Description stays on screen.
+  const tableRef = useRef<HTMLDivElement>(null);
+  const tableRem = useWidthRem(tableRef);
+  const stacked = tableRem !== null && tableRem < 52;
 
   const get = (k: (typeof FILTER_KEYS)[number]) => params.get(k) ?? "";
   const q = get("q");
@@ -180,7 +197,7 @@ export function SearchView() {
           </div>
         </fieldset>
 
-        <div className="flex items-end gap-2">
+        <div className="flex flex-wrap items-end gap-2">
           <label className="flex flex-col gap-1.5">
             <span className="tl-label">Published from</span>
             <Input type="date" value={get("from")} onChange={(e) => update({ from: e.target.value })} className="w-[9.375rem] tl-mono" />
@@ -230,7 +247,7 @@ export function SearchView() {
       {error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : (
-        <div className={`transition-opacity duration-150 ${loading && data ? "opacity-60" : ""}`}>
+        <div ref={tableRef} className={`transition-opacity duration-150 ${loading && data ? "opacity-60" : ""}`}>
           <DataTable
             caption="Search results"
             loading={!data}
@@ -249,26 +266,48 @@ export function SearchView() {
               />
             }
             columns={[
-              { key: "id", header: "CVE", width: "8.75rem", render: (r) => <IdText id={r.cve_id} className="text-paper" /> },
-              { key: "sev", header: "Severity", width: "5.75rem", render: (r) => <SeverityTag severity={r.cvss_severity} score={r.cvss_base_score} /> },
-              {
-                key: "date",
-                header: "Published",
-                width: "6.5rem",
-                render: (r) => <span className="tl-mono text-xs text-paper-dim">{fmtDate(r.published_date)}</span>,
-              },
+              ...(stacked
+                ? [
+                    {
+                      key: "id",
+                      header: "CVE / Published",
+                      width: "8.75rem",
+                      render: (r: CveRow) => (
+                        <span className="block">
+                          <IdText id={r.cve_id} className="text-paper" />
+                          <span className="tl-mono block text-xs text-paper-dim">{fmtDate(r.published_date)}</span>
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "sev",
+                      header: "Severity / CWE",
+                      width: "6.5rem",
+                      render: (r: CveRow) => (
+                        <span className="block">
+                          <SeverityTag severity={r.cvss_severity} score={r.cvss_base_score} />
+                          <span className="block">{cweCell(r)}</span>
+                        </span>
+                      ),
+                    },
+                  ]
+                : [
+                    { key: "id", header: "CVE", width: "8.75rem", render: (r: CveRow) => <IdText id={r.cve_id} className="text-paper" /> },
+                    {
+                      key: "sev",
+                      header: "Severity",
+                      width: "5.75rem",
+                      render: (r: CveRow) => <SeverityTag severity={r.cvss_severity} score={r.cvss_base_score} />,
+                    },
+                    {
+                      key: "date",
+                      header: "Published",
+                      width: "6.5rem",
+                      render: (r: CveRow) => <span className="tl-mono text-xs text-paper-dim">{fmtDate(r.published_date)}</span>,
+                    },
+                  ]),
               { key: "kev", header: "KEV", width: "3rem", render: (r) => (r.is_kev ? <KevTag compact /> : null) },
-              {
-                key: "cwe",
-                header: "CWE",
-                width: "6rem",
-                render: (r) => (
-                  <span className="tl-mono text-xs text-paper-dim" title={r.cwes.join(", ")}>
-                    {r.cwes[0] ?? <span className="text-paper-faint">none</span>}
-                    {r.cwes.length > 1 ? <span className="text-paper-faint"> +{r.cwes.length - 1}</span> : null}
-                  </span>
-                ),
-              },
+              ...(stacked ? [] : [{ key: "cwe", header: "CWE", width: "6rem", render: cweCell }]),
               {
                 key: "desc",
                 header: "Description",

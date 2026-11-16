@@ -1,15 +1,16 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { DataTable } from "@/components/ui/DataTable";
+import { type Column, DataTable } from "@/components/ui/DataTable";
 import { EmptyState, ErrorState } from "@/components/ui/States";
 import { PageHeader } from "@/components/ui/Text";
 import { useApi } from "@/lib/client/api";
 import type { AuditRow } from "@/lib/cve";
 import type { Paged } from "@/lib/types";
 import { fmtExact, fmtInt, fmtRelative } from "../../_shared/format";
+import { useWidthRem } from "../../_shared/useRem";
 
 /**
  * /admin/audit: who did what, newest first. Rows come from the database
@@ -46,6 +47,10 @@ export function AuditLog() {
     return () => clearInterval(t);
   }, []);
 
+  const tableRef = useRef<HTMLDivElement>(null);
+  const tableRem = useWidthRem(tableRef);
+  const stacked = tableRem !== null && tableRem < 56;
+
   const go = (next: { action?: string; page?: number }) => {
     const p = new URLSearchParams();
     const a = next.action ?? action;
@@ -55,6 +60,65 @@ export function AuditLog() {
     const s = p.toString();
     router.replace(s ? `${pathname}?${s}` : pathname, { scroll: false });
   };
+
+  // Cell renderers, shared by the wide and the stacked column sets.
+  const when = (r: AuditRow) => (
+    <time dateTime={r.ts} title={fmtExact(r.ts)} className="tl-mono text-xs text-paper-dim">
+      {fmtRelative(r.ts, now)}
+    </time>
+  );
+  const act = (r: AuditRow) => (
+    <span className={`tl-mono text-xs ${r.action === "LOGIN_FAIL" ? "text-hazard" : "text-paper"}`}>{r.action}</span>
+  );
+  const user = (r: AuditRow) =>
+    r.username ? (
+      <span className="block truncate text-[0.8125rem]">{r.username}</span>
+    ) : (
+      <span className="text-xs text-paper-faint">{r.action === "LOGIN_FAIL" ? "unknown user" : "none"}</span>
+    );
+  const record = (r: AuditRow) => (
+    <span className="tl-mono text-xs">
+      {r.entity}
+      {r.entity_id ? <span className="text-paper-dim"> #{r.entity_id}</span> : null}
+    </span>
+  );
+  const details: Column<AuditRow> = { key: "details", header: "Details", width: "minmax(10rem,1fr)", render: (r) => <Details d={r.details} /> };
+
+  // Five columns need about 52rem. In a narrower box (tablet, or text size
+  // L/XL), User goes under When and Record under Action, so Details stays visible.
+  const columns: Column<AuditRow>[] = stacked
+    ? [
+        {
+          key: "ts",
+          header: "When / User",
+          width: "9.375rem",
+          render: (r) => (
+            <span className="block min-w-0">
+              {when(r)}
+              {user(r)}
+            </span>
+          ),
+        },
+        {
+          key: "action",
+          header: "Action / Record",
+          width: "9rem",
+          render: (r) => (
+            <span className="block">
+              <span className="block">{act(r)}</span>
+              {record(r)}
+            </span>
+          ),
+        },
+        details,
+      ]
+    : [
+        { key: "ts", header: "When", width: "9.375rem", render: when },
+        { key: "action", header: "Action", width: "7rem", render: act },
+        { key: "user", header: "User", width: "8.125rem", render: user },
+        { key: "entity", header: "Record", width: "10.625rem", render: record },
+        { ...details, width: "minmax(13.75rem,1fr)" },
+      ];
 
   return (
     <div>
@@ -91,7 +155,7 @@ export function AuditLog() {
       {error ? (
         <ErrorState message={error} onRetry={reload} />
       ) : (
-        <div className={`transition-opacity duration-150 ${loading && data ? "opacity-60" : ""}`}>
+        <div ref={tableRef} className={`transition-opacity duration-150 ${loading && data ? "opacity-60" : ""}`}>
           <DataTable
             caption="Audit log"
             loading={!data}
@@ -110,47 +174,7 @@ export function AuditLog() {
                 }
               />
             }
-            columns={[
-              {
-                key: "ts",
-                header: "When",
-                width: "9.375rem",
-                render: (r) => (
-                  <time dateTime={r.ts} title={fmtExact(r.ts)} className="tl-mono text-xs text-paper-dim">
-                    {fmtRelative(r.ts, now)}
-                  </time>
-                ),
-              },
-              {
-                key: "action",
-                header: "Action",
-                width: "7rem",
-                render: (r) => <span className={`tl-mono text-xs ${r.action === "LOGIN_FAIL" ? "text-hazard" : "text-paper"}`}>{r.action}</span>,
-              },
-              {
-                key: "user",
-                header: "User",
-                width: "8.125rem",
-                render: (r) =>
-                  r.username ? (
-                    <span className="block truncate text-[0.8125rem]">{r.username}</span>
-                  ) : (
-                    <span className="text-xs text-paper-faint">{r.action === "LOGIN_FAIL" ? "unknown user" : "none"}</span>
-                  ),
-              },
-              {
-                key: "entity",
-                header: "Record",
-                width: "10.625rem",
-                render: (r) => (
-                  <span className="tl-mono text-xs">
-                    {r.entity}
-                    {r.entity_id ? <span className="text-paper-dim"> #{r.entity_id}</span> : null}
-                  </span>
-                ),
-              },
-              { key: "details", header: "Details", width: "minmax(13.75rem,1fr)", render: (r) => <Details d={r.details} /> },
-            ]}
+            columns={columns}
           />
         </div>
       )}

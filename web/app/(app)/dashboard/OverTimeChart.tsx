@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import type { StatsOverview } from "@/lib/cve";
 import { fmtInt, fmtMonth } from "../_shared/format";
+import { useRootPx } from "../_shared/useRem";
 
 /**
  * 02 / OVER TIME: CVEs published per month as a quiet area in paper-dim,
@@ -15,10 +16,11 @@ import { fmtInt, fmtMonth } from "../_shared/format";
  * a table (HANDOFF 4.10 accessibility).
  * The current calendar month is still filling up, so it is left off the
  * chart (it would look like a collapse) and stated in words underneath.
+ * Recharts takes px numbers, so axis text, the y-axis width and the right
+ * margin are computed from the root font size: they grow with the Text size
+ * control like the rest of the page (HANDOFF 4.10, rem not px).
  */
 type Month = StatsOverview["byMonth"][number];
-
-const AXIS = { fontFamily: "var(--font-mono)", fontSize: 11, fill: "var(--color-paper-faint)" };
 
 function Tip({ active, payload }: { active?: boolean; payload?: { payload: Month }[] }) {
   if (!active || !payload?.length) return null;
@@ -34,6 +36,8 @@ function Tip({ active, payload }: { active?: boolean; payload?: { payload: Month
 
 export function OverTimeChart({ months: all }: { months: Month[] }) {
   const [asTable, setAsTable] = useState(false);
+  const rem = useRootPx();
+  const axis = { fontFamily: "var(--font-mono)", fontSize: 0.6875 * rem, fill: "var(--color-paper-faint)" };
   const now = new Date();
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const partial = all.find((m) => m.month === thisMonth) ?? null;
@@ -85,17 +89,18 @@ export function OverTimeChart({ months: all }: { months: Month[] }) {
       ) : (
         <div className="h-[15rem] w-full" role="img" aria-label={`CVEs per month, ${months.length} months. Use Show table for the numbers.`}>
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={months} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+            {/* right margin: room for half of the last month label ("Oct 2026"), which is centred on the last point */}
+            <ComposedChart data={months} margin={{ top: 0.5 * rem, right: 2.5 * rem, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--color-rule)" vertical={false} />
               <XAxis
                 dataKey="month"
                 tickFormatter={(m: string) => fmtMonth(m, shortTicks)}
-                tick={AXIS}
+                tick={axis}
                 axisLine={{ stroke: "var(--color-rule)" }}
                 tickLine={false}
-                minTickGap={24}
+                minTickGap={1.5 * rem}
               />
-              <YAxis tick={AXIS} axisLine={false} tickLine={false} width={48} tickFormatter={(n: number) => fmtInt(n)} />
+              <YAxis tick={axis} axisLine={false} tickLine={false} width={3.25 * rem} tickFormatter={(n: number) => fmtInt(n)} />
               <Tooltip content={<Tip />} cursor={{ stroke: "var(--color-rule-strong)" }} isAnimationActive={false} />
               <Area
                 type="linear"
