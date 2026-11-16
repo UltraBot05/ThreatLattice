@@ -301,6 +301,15 @@ SELECT 'P08' AS test, CONCAT('no-op=', @p08_noop, ', real=', @p08_real) AS actua
        'no-op=0, real=1' AS expected,
        IF(@p08_noop = 0 AND @p08_real = 1, 'PASS', 'FAIL') AS result;
 
+-- P09 A case-only edit is a real change: the column collation ignores case,
+-- so trg_inv_au compares bytes. Upper-casing the notes adds one UPDATE row.
+UPDATE investigation SET notes = 'CHANGED NOTES' WHERE investigation_id = @inv;
+SET @p09_rows = (SELECT COUNT(*) FROM audit_log
+                 WHERE entity = 'investigation' AND entity_id = @inv AND action = 'UPDATE');
+SELECT 'P09' AS test, CONCAT('update rows=', @p09_rows) AS actual,
+       'update rows=2' AS expected,
+       IF(@p09_rows = 2, 'PASS', 'FAIL') AS result;
+
 -- ---------------------------------------------------------------------
 -- Cleanup: remove every test row so real data is untouched.
 -- ---------------------------------------------------------------------
