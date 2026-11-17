@@ -261,6 +261,7 @@ docs/                data dictionary, ER diagram, testing results, screenshots, 
 
 | Document | What is in it |
 |---|---|
+| [Project report](docs/019_045_ThreatLattice_Report.pdf) | the final report (PDF, 32 pages): ER model, mapping, DDL, DML, queries, routines and triggers, front end, references |
 | [Data dictionary](docs/data_dictionary.md) | every table and column, with keys, constraints and notes |
 | [Testing results](docs/testing.md) | each constraint test, the expected and actual error, and observations |
 | [ER diagram](docs/diagrams/er_v2.svg) | schema v2 ([draw.io source](docs/diagrams/er_v2.drawio)) |
